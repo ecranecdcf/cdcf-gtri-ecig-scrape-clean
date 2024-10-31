@@ -15,6 +15,10 @@ def find_nicotine_levels(text):
     percent_matches = set(re.findall(pattern_percent, text, re.IGNORECASE))
     mg_matches = set(re.findall(pattern_mg, text, re.IGNORECASE))
 
+    # Check for "Zero Nicotine" and add 0% if found
+    if re.search(zero_nicotine_pattern, text, re.IGNORECASE):
+        percent_matches.add('0.0')
+
     # Convert matches to numbers (handling float if needed)
     percent_list = sorted({float(match) for match in percent_matches if match.replace('.', '').isdigit()})
     mg_list = sorted({float(match) for match in mg_matches if match.replace('.', '').isdigit()})
@@ -22,7 +26,7 @@ def find_nicotine_levels(text):
     # Remove mg values that correspond to percentages (mg = percent * 10)
     mg_list = [mg for mg in mg_list if not any(abs(mg - percent * 10) < 1e-6 for percent in percent_list)]
     
-    # Remove values greater than 70mg or 7%
+    # Remove values greater than 70mg or 7% to prevent brittleness for pattern matches. Currently have not seen anything greater than these.
     percent_list = [percent for percent in percent_list if percent <= 7.0]
     mg_list = [mg for mg in mg_list if mg <= 70.0]
 
@@ -84,6 +88,7 @@ def populate_nicotine_and_eliquid(df):
 
     return df
  
+### Regex for finding nicotine free by checking the different 
 def find_nic_free(row):   
     if row['FINAL_Nicotine_Levels'] == 'LEVELS':
         if row['FINAL_Nic_level_1'] == '0 PERCENT' or row['FINAL_Nic_level_1'] == '0 MG':
