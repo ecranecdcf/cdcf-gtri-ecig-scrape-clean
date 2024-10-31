@@ -187,7 +187,7 @@ def classify_product(pipe, text):
             {text}
             [/INST]
         """
-        outputs = pipe(prompt, max_new_tokens=256, do_sample=False)
+        outputs = pipe(prompt, max_new_tokens=128, do_sample=False)
         response = outputs[0]["generated_text"].strip()
         return response
 
