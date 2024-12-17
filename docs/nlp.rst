@@ -14,7 +14,7 @@ Currently a combination of regular expressions and LLMs. All under the ``nlp/llm
 
 LLM Setup
 ---------
-:download:`InstructionsDorDownloadingLLaMALLMmodel.docx <./InstructionsDorDownloadingLLaMALLMmodel.docx>`
+Download :download:`InstructionsDorDownloadingLLaMALLMmodel.docx <./InstructionsDorDownloadingLLaMALLMmodel.docx>`
 
 
 
