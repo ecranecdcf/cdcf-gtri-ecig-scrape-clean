@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to CDCF E-Cigarette Scraping and Analysis's documentation!
-==================================================================
+E-Cigarette Scraping and Analysis Documentation
+===============================================
 
 .. toctree::
    :maxdepth: 2
