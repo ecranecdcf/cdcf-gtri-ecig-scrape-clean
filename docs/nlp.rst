@@ -12,7 +12,9 @@ Currently a combination of regular expressions and LLMs. All under the ``nlp/llm
    - Other functions that use the LLM code, including prompts, are available in ``llm_functions.py``. Currently, the LLM code uses a fine-tuned version of Meta's ``Llama-3.1-8B-Instruct`` model. Instructions for setting up this model are found under ``doc/Instructions for downloading LLaMA LLM model.docx``.
    - An output viewer for a better understanding of the NLP output is available in ``output_explorer.ipynb``.
 
-
+LLM Setup
+---------
+:download:`InstructionsDorDownloadingLLaMALLMmodel.docx <./InstructionsDorDownloadingLLaMALLMmodel.docx>`
 
 
 
