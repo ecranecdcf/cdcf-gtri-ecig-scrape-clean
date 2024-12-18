@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'CDCF E-Cigarette Scraping and Analysis'
-copyright = '2024, CDCF'
+project = 'E-Cigarette Scraping and Analysis'
+copyright = '2024'
 author = 'CDCF'
 
 
