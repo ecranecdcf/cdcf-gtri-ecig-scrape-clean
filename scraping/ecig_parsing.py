@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import time
 import csv
 import pandas as pd
+from collections import Counter
 
 from PIL import Image
 from io import BytesIO
@@ -18,6 +19,198 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+section_strings_raw = {
+    'Display Screen': 'screen',
+    'Charging': 'charging',
+    'Operation': 'operation',
+    'Prefilled Capacity': 'prefilled',
+    'Compatibility': 'compatibility',
+    'Ingredients': 'ingredients',
+    'INCLUDES': 'package_contents',
+    "What's Included": 'package_contents',
+    'Package Content': 'package_contents',
+    'Package Contents': 'package_contents',
+    'Package Includes': 'package_contents',
+    'Included in package': 'package_contents',
+    'Included in the Package': 'package_contents',
+    'Included': 'package_contents',
+    'Includes': 'package_contents',
+    "What’s Included": 'package_contents',
+    'CALIFORNIA PROPOSITION 65 - Warning': 'warning',
+    'Warning': 'warning',
+    'AVAILABLE OPTIONS': 'key_features',
+    'Key Features': 'key_features',
+    'Features': 'key_features',
+    'Flavors': 'flavors',
+    'Flavor Selection': 'flavors',
+    'Flavor Options': 'flavors',
+    'Cutting-Edge Design and Technology:': 'key_features',
+    'Superior Versatility and Performance:': 'key_features',
+    'Flavor Selection:': 'flavors',
+    'WARNING': 'warning',
+    'Description': 'description',
+    'Product Specifications': 'specifications',
+    'Available Flavors': 'flavors',
+    'Flavor Profiles': 'flavors',
+    'Exceptional Flexibility and Performance': 'performance',
+    'Disposable': 'disposable',
+    'Lost Mary x Elf Bar OS5000 Disposable Features': 'key_features',
+    'Tailored to Your Preference': 'preference',
+    'Why Geek Bar Skyview Disposable?': 'why',
+    'Enjoy My Shisha on the Go': 'enjoyment',
+    'The Ultimate Vaping Experience': 'enjoyment',
+    'Elevate Your Vaping Experience': 'enjoyment',
+    'Why Choose the Juice Head 30K Disposable?': 'why',
+    'Why Geek Bar Skyview Disposable?': 'why',
+    'Hotbox Features': 'key_features',
+    'Lost Mary x Elf Bar OS5000 Disposable Features': 'key_features',
+    'Experience the Ultimate Vaping Innovation': 'innovation',
+    'Flavor Details': 'flavors',
+    'Advanced Dual Mesh Coil': 'coil',
+    'Coil Specifications': 'coil',
+    'Puff Count': 'puffs',
+    'Max Puffs': 'puffs',
+    'Nicotine Strength': 'nicotine',
+    'Battery Capacity': 'battery',
+    'E-liquid Capacity': 'e_liquid',
+    'Maximum Puffs': 'puffs',
+    'Available Flavor Profiles': 'flavors',
+    'Prefilled': 'prefilled',
+    'Compatible Devices': 'devices',
+    'Devices': 'devices',
+    'California Proposition 65 Warning': 'warning',
+    'Melli Flavors': 'flavors',
+    'Airflow': 'airflow',
+    'Heating Element': 'heating_element',
+    'Digital Screen': 'screen',
+    "FAQ's": "faqs",
+    "FAQs": "faqs",
+    "FAQ": "faqs",
+    'LED Screen': 'screen',
+    'Display Screen': 'screen',
+    'Charging': 'charging',
+    'Charging Port Info': 'charging',
+    'Operation': 'operation',
+    'Prefilled Capacity': 'prefilled',
+    'Compatibility': 'compatibility',
+    'Compatible with': 'compatibility',
+    'Ingredients': 'ingredients',
+    'INCLUDES': 'package_contents',
+    'Kit Includes': 'package_contents',
+    "What's Included": 'package_contents',
+    'Package Content': 'package_contents',
+    'Package Contents': 'package_contents',
+    'Package Includes': 'package_contents',
+    'Included in package': 'package_contents',
+    'Included in the Package': 'package_contents',
+    'Included': 'package_contents',
+    'Includes': 'package_contents',
+    'Contents': 'package_contents',
+    "What’s Included": 'package_contents',
+    'CALIFORNIA PROPOSITION 65 - Warning': 'warning',
+    'CAUTION: this Product Contains Nicotine. Nicotine is an addictive chemical.': 'warning',
+    'Warning': 'warning',
+    'AVAILABLE OPTIONS': 'key_features',
+    'Features and Specifications': 'key_features',
+    'Key Features': 'key_features',
+    'Features': 'key_features',
+    'Flavors': 'flavors',
+    'Flavor Selection': 'flavors',
+    'Flavor Options': 'flavors',
+    'Cutting-Edge Design and Technology:': 'key_features',
+    'Superior Versatility and Performance:': 'key_features',
+    'Flavor Selection:': 'flavors',
+    'WARNING': 'warning',
+    'Description': 'description',
+    'Product Specifications': 'specifications',
+    'Specifications': 'specifications',
+    'Available Flavors': 'flavors',
+    'Flavor Profiles': 'flavors',
+    'Exceptional Flexibility and Performance': 'performance',
+    'Disposable': 'disposable',
+    'Lost Mary x Elf Bar OS5000 Disposable Features': 'key_features',
+    'Tailored to Your Preference': 'preference',
+    'Why Geek Bar Skyview Disposable?': 'why',
+    'Enjoy My Shisha on the Go': 'enjoyment',
+    'The Ultimate Vaping Experience': 'enjoyment',
+    'Elevate Your Vaping Experience': 'enjoyment',
+    'Why Choose the Juice Head 30K Disposable?': 'why',
+    'Why Geek Bar Skyview Disposable?': 'why',
+    'Features and Specifications': 'key_features',
+    'Hotbox Features': 'key_features',
+    'Lost Mary x Elf Bar OS5000 Disposable Features': 'key_features',
+    'Experience the Ultimate Vaping Innovation': 'innovation',
+    'Flavor Details': 'flavors',
+    'Advanced Dual Mesh Coil': 'coil',
+    'Coil Specifications': 'coil',
+    'Battery Info': 'battery',
+    'Battery': 'battery',
+    'Puffs per Device': 'puffs',
+    'Puff Count': 'puffs',
+    'Max Puffs': 'puffs',
+    'What Is a Puff Count?': 'puffs',
+    'Nicotine Strengths': 'nicotine',
+    'Nicotine Level': 'nicotine',
+    'Available Nicotine': 'nicotine',
+    'Nicotine': 'nicotine',
+    'Nicotine Strength': 'nicotine',
+    'Battery Capacity': 'battery',
+    'E-liquid Capacity': 'e_liquid',
+    'E-liquid contents': 'e_liquid',
+    'E-Liquid contents': 'e_liquid',
+    'Maximum Puffs': 'puffs',
+    'Available Flavor Profiles': 'flavors',
+    'Prefilled': 'prefilled',
+    'Compatible Devices': 'devices',
+    'Devices': 'devices',
+    'California Proposition 65 Warning': 'warning',
+    'Melli Flavors': 'flavors',
+    'Airflow': 'airflow',
+    'Adjustable Airflow': 'airflow',
+    'Heating Element': 'heating_element',
+    'Quick Links': 'links',
+    'Quick Link': 'links',
+    'Related Links':'links',
+    'Related Link':'links',
+    'Colors': 'colors',
+    'Color': 'colors',
+    'Available Colors': 'colors',
+    'Quick links': 'links',
+    'Flavor': 'flavors',
+    'Size': 'size',
+    'Sizes': 'size',
+    'Dimensions': 'size',
+    'Bottle Size': 'size',
+    'Bottle Sizes': 'size',
+    'Return and Exchange Policy Disclaimer:': 'returns',
+    'Returns': 'returns',
+    'Pods': 'pods',
+    'Pod Info': 'pods',
+    'Pod Capacity': 'pods',
+    'Options': 'options',
+    'Option': 'options',
+    'Compatible Hardware': 'hardware',
+    'Hardware': 'hardware',
+    'Wattage Info': 'wattage',
+    'Wattage': 'wattage',
+    'Coil': 'coil',
+    'Coils': 'coil',
+    'Available Nicotine': 'nicotine',
+    'How Are Disposables Different Than Others?': 'disposable',
+    'VG/PG Ratio': 'vgpg_ratio',
+    'VGPG Ratio': 'vgpg_ratio',
+    'VG-PG Ratio': 'vgpg_ratio',
+    'Vg/Pg Ratio': 'vgpg_ratio',
+    'Power Mode Settings': 'power_mode',
+    'Power Mode': 'power_mode',
+    '3D Curved Screen': 'screen',
+    'Name Change': 'name',
+    'Variable Wattage': 'wattage',
+    'Disposable Vape Battery': 'battery',
+    'Battery Pack/Charging Dock': 'battery'
+
+}
 
 brands = ['7 Daze Reds Apple Salt',
  'Lucy Pouches',
@@ -424,7 +617,181 @@ flavor_regex = re.compile('({})'.format(words), flags=re.IGNORECASE)
 
 
 
+def parse_description_sections(desc_section, all_headers, header_samples, full_link):
+    description = ''
+    warning = ''
+    package_contents = ''
+    ingredients = ''
+    key_features = ''
+    flavors = ''
+    specifications = ''
+    performance = ''
+    disposable = ''
+    why = ''
+    preference = ''
+    innovation = ''
+    enjoyment = ''
+    compatibility = ''
+    coil = ''
+    battery = ''
+    puffs = ''
+    nicotine = ''
+    e_liquid = ''
+    prefilled = ''
+    devices = ''
+    airflow = ''
+    heating_element = ''
+    operation = ''
+    charging = ''
+    screen = ''
+    links_txt = ''
+    colors = ''
+    options_txt = ''
+    returns = ''
+    size = ''
+    pods = ''
+    hardware = ''
+    wattage = ''
+    faqs = ''
+    vgpg_ratio = ''
+    power_mode = ''
+    name = ''
 
+
+    
+    functions = [
+        str.upper,
+        str.lower,
+        str.capitalize,
+        str.title,
+        str.swapcase,
+        str.casefold
+    ]
+    section_strings = dict()
+    for k, v in section_strings_raw.items():
+        key = k
+        section_strings[key] = v
+        if key.endswith(':'):
+            key = key.replace(':', '')
+            section_strings[key] = v
+            
+            key = key.strip() + '-'
+            section_strings[key] = v
+            key = key.strip() + '--'
+            section_strings[key] = v
+            key = key.strip() + ' - '
+            section_strings[key] = v
+        else:
+            key = key.strip() + ':'
+            section_strings[key] = v
+            
+            key = key.strip() + '-'
+            section_strings[key] = v
+            key = key.strip() + '--'
+            section_strings[key] = v
+            key = key.strip() + ' - '
+            section_strings[key] = v
+            
+        key = key.strip() + '::'
+        section_strings[key] = v
+        
+        for func in functions:
+            key = func(k)
+            section_strings[key] = v
+            if key.endswith(':'):
+                key = key.replace(':', '')
+                section_strings[key] = v
+
+                key = key.strip() + '-'
+                section_strings[key] = v
+                key = key.strip() + '--'
+                section_strings[key] = v
+                key = key.strip() + ' - '
+                section_strings[key] = v
+            else:
+                key = key.strip() + ':'
+                section_strings[key] = v
+
+                key = key.strip() + '-'
+                section_strings[key] = v
+                key = key.strip() + '--'
+                section_strings[key] = v
+                key = key.strip() + ' - '
+                section_strings[key] = v
+
+            key = key.strip() + '::'
+            section_strings[key] = v
+        
+    
+    section_map = {
+        'description': description,
+        'warning': warning,
+        'package_contents': package_contents,
+        'ingredients': ingredients,
+        'key_features': key_features,
+        'flavors': flavors,
+        'specifications': specifications,
+        'performance': performance,
+        'disposable': disposable,
+        'why': why,
+        'innovation': innovation,
+        'preference': preference,
+        'enjoyment': enjoyment,
+        'compatibility': compatibility,
+        'coil': coil,
+        'battery': battery,
+        'puffs': puffs,
+        'nicotine': nicotine,
+        'e_liquid': e_liquid,
+        'prefilled': prefilled,
+        'devices': devices,
+        'airflow': airflow,
+        'heating_element': heating_element,
+        'operation': operation,
+        'charging': charging,
+        'screen': screen,
+        'links': links_txt,
+        'colors': colors,
+        'returns': returns,
+        'options': options_txt,
+        'size': size,
+        'pods': pods,
+        'hardware': hardware,
+        'wattage': wattage,
+        'faqs': faqs,
+        'vgpg_ratio': vgpg_ratio,
+        'power_mode': power_mode,
+        'name': name
+    }
+    if desc_section:
+        cur_section = 'description'
+        if desc_section:
+            headers = [tag.text for tag in desc_section.find_all(lambda tag: tag.name in ['strong','h1', 'h2', 'h3', 'h4', 'h5'])]
+            stext = desc_section.get_text(separator='\n').split('\n')
+            for s in stext:
+                s = s.strip()
+                if s == '':
+                    continue
+                s_no_colon = s.replace(':', '').strip()
+                if s in section_strings:
+                    cur_section = section_strings[s]
+                elif s_no_colon in section_strings:
+                    cur_section = section_strings[s_no_colon]
+                elif s.lower().startswith('why') and s.endswith('?'):
+                    cur_section = 'why'
+                elif 'features:' in s.lower():
+                    cur_section = 'key_features'
+                elif s in headers:
+                    all_headers.append(s)
+                    header_samples[s] = full_link
+                    header_counter = Counter(all_headers)
+                    #if header_counter[s] > 5:
+                    #    print(s, full_link)
+                    cur_section = 'description'
+                    section_map[cur_section] += f'{s}\n\n'
+                else:
+                    section_map[cur_section] += f'{s}\n'
+    return section_map
 
 
 # Function to download and save an image
