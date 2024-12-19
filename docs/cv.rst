@@ -3,8 +3,8 @@
 Computer Vision
 ===============
 
-YOLO V8 Code
-_____________
+Pre-processing (YOLO V8 Code)
+_____________________________
 
 **predict.py**
 
@@ -62,3 +62,13 @@ _____________
 **YOLO Data**
 
     The data is split into training and validation sets containing 6153 and 1222 images respectively. All images have a cooresponding label file which contains the bounding box information in the YOLO format to be used for training or validation. Each line of the label file cooresponds to a single bounding box, the line starts with a single number representing the class of the object, followed by four numbers, each representing one of the corners of the bounding box. Empty label files indicate the images contains no objects of interest. This dataset has three seperate classes, class 0 represents cigarettes, class 1 represents vapes, and class 2 represents vape juices. 
+
+
+
+Iced
+----
+
+
+
+Screens
+-------
