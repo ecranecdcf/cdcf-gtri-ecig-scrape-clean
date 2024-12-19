@@ -24,18 +24,38 @@ Some of the original regular expression functions developed as a demo are availa
 Total Items Scraped
 -------------------
 
-=================  =================  =================
-Site              Items gathered     Images gathered
-=================  =================  =================
-mipod+            1,053              1,036
-csvape            621                439
-getoop            972                972
-myvaporstore      2,056              578
-vape.com          5,454              34,589
-perfectvape       923                2,835
-vapewh            362                12,957
-vapesourcing      2,587              34,243
-vaping.com        1,202              4,020
-=================  =================  =================
+.. list-table:: Gathered Data
+   :header-rows: 1
+
+   * - Site
+     - Items gathered
+     - Images gathered
+   * - mipod
+     - 1,053
+     - 1,036
+   * - csvape
+     - 621
+     - 439
+   * - getoop
+     - 972
+     - 972
+   * - myvaporstore
+     - 2,056
+     - 578
+   * - vape.com
+     - 5,454
+     - 34,589
+   * - perfectvape
+     - 923
+     - 2,835
+   * - vapewh
+     - 362
+     - 12,957
+   * - vapesourcing
+     - 2,587
+     - 34,243
+   * - vaping.com
+     - 1,202
+     - 4,020
 
 Mipod provided by CDCF.
