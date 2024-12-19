@@ -45,12 +45,12 @@ NLP Features
      - 
      - 
      - 
-   * - Product Type
-     - 
-     - 
-     - 
-     - 
    * - Screens
+     - A regular-expression based script to detect various screen features: display_type, color_display, touch_screen, curved_screen, battery_indicator, eliquid_indicator, smart_display, digital_display, hd_display, animated,backlit
+     - `nlp/screens.py`
+     - `nlp/screens_sample_data`
+     - Does not capture all aspects of 'gaming' features, which will be part of another script.
+   * - Product Type
      - 
      - 
      - 
