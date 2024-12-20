@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 
+### Function to extract nicotine levels from text
 def find_nicotine_levels(text):
     text = str(text)
 
@@ -51,9 +52,8 @@ def find_nicotine_levels(text):
 
     return 'LEVELS', all_values
 
-
-
-### I haven't seen anything indicative of multiple eliquid amounts--could update this if that is ever at thing. Would need to figure out how to code this per CDC.
+### Function to extract e-liquid values from text
+### JPJ: I haven't seen anything indicative of multiple eliquid amounts--could update this if that is ever at thing. Would need to figure out how to code this per CDC.
 def find_eliquid_contents(text):
     text = str(text)
     pattern_ml = r'(\d+\.?\d*)\s*(?:ml)'
@@ -66,6 +66,7 @@ def find_eliquid_contents(text):
     else:
         return (str(ml_list[0]) + " mL")  
 
+### Function to populate nicotine and e-liquid values
 def populate_nicotine_and_eliquid(df):
     if 'FINAL_Nicotine_Levels' not in df.columns:
             df['FINAL_Nicotine_Levels'] = pd.NA
@@ -103,10 +104,44 @@ def find_nic_free(row):
         nic_free = 0
     return nic_free
 
+### Function to populate nicotine free 
 def populate_nic_free(df):
     if 'FINAL_Nic_Free' not in df.columns:
         df['FINAL_Nic_Free'] = pd.NA 
     df['FINAL_Nic_Free'] = df.apply(find_nic_free, axis=1)
     return df
 
-    
+### Function to extract flavors and descriptions into a dictionary 
+### JPJ: Currently only for vapedotcom
+def extract_flavors_with_descriptions(dataset, text):
+    # remove empty fields
+    if not isinstance(text, str) or text == ':': 
+        return {}
+    # Split the input text into lines or separators 
+    flavor_lines = re.split(r'\n|,', text)  
+    flavor_dict = {}
+
+    for line in flavor_lines:
+        line = line.strip()
+        if not line:
+            continue
+        
+        ### vapedotcom - most common patterns
+        if dataset == 'vapedotcom':
+            match = re.match(r"^(.*?)(?:\s*â€“|\s*-\s*|\s*\|)\s*(.*)$", line)
+            if match:
+                flavor = match.group(1).strip()
+                description = match.group(2).strip()
+                flavor_dict[flavor] = description
+            else:
+                flavor_dict[line] = None
+        ### vapewh - most common patterns
+        elif dataset == 'vapewh':
+            normalized_text = re.sub(r'\n(?![A-Za-z0-9 ]+[:\-])', ' ', text)
+            match = re.findall(r'([A-Za-z0-9 *()]+)(?:\s*[:\-]\s*(.*?))?(?=(?:[A-Za-z0-9 *()]+[:\-])|$)', normalized_text, re.DOTALL)
+            for flavor, description in flavor_lines:
+                flavor = flavor.strip()
+                description = description.strip() if description else None
+                flavor_dict[flavor] = description
+        
+    return flavor_dict
