@@ -1,5 +1,5 @@
 Agenda October 3, 2024 
-=======================
+--------------
 
 | Updates
 | New team members
@@ -10,7 +10,6 @@ Agenda October 3, 2024
 | Initial NLP efforts
 | Image classification
 
-Agenda October 3, 2024
 
 Data Gathering
 --------------

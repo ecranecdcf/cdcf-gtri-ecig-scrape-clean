@@ -1,5 +1,5 @@
 Agenda October 17, 2024 
-========================
+--------------
 
 | Updates
 | Project management

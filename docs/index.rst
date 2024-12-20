@@ -7,7 +7,7 @@ E-Cigarette Scraping and Analysis Documentation
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Main Topics
 
    introduction
