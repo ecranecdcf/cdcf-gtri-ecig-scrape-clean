@@ -33,7 +33,7 @@ NLP Features
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 40 30 30 40
+   :widths: 20 40 20 20 30
 
    * - Feature Name
      - Description
@@ -42,7 +42,7 @@ NLP Features
      - Notes
    * - Flavors
      - Currently, flavors is captured using regex and completed for common patterns in vape.com and vapewh. We are in the process of implementing LLM prompting to extract the flavors. Flavors currently are stored in a dictionary data structure, with the key being the flavor name and value being the description.
-     - `nlp/llm_code/regex_functions/extract_flavors_with_descriptions`
+     - `nlp/llm_code/regex_functions/extract_flavors_with_descriptions`, `nlp/flavor` (MyVaporStore)
      - `nlp/llm_code/datasets/output/processed_output`
      - Since data is not consistent across different sources, we are working to standardize it. LLM will assist in standardizing the data for easier parsing and storage.
    * - Screens
