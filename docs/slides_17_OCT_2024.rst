@@ -14,13 +14,13 @@ Agenda October 17, 2024
 
 
 NLP Updates
----------------------------
+~~~~~~~~~~
 
 Made progress on TFN
 
 
 TFN/CBD Samples
----------------------------
+~~~~~~~~~~
 
 .. image:: images/1017_1.png
    :alt: vapes tfn samples
@@ -28,7 +28,7 @@ TFN/CBD Samples
    :align: left
 
 Computer Vision Model Updates
----------------------------
+~~~~~~~~~~
 
 | Working on implementing pre-labeled vape data set to clean our images,
   and be able to extract non-vapes.
@@ -42,7 +42,7 @@ Computer Vision Model Updates
 
 
 Image Cleaning
----------------------------
+~~~~~~~~~~
 
 | Found a public dataset of vape images with bounding box ground truth,
   about 2100 images.
@@ -58,7 +58,7 @@ Image Cleaning
 
 
 Prediction Examples
----------------------------
+~~~~~~~~~~
 
 .. image:: images/1017_2.png
    :alt: prediction examples
@@ -66,7 +66,7 @@ Prediction Examples
    :align: left
 
 Background: Vision-Language Models
----------------------------
+~~~~~~~~~~
 
 | Some vape data has a text component, a vision component, or both
 | E.g: iced flavors, presence of screens, etc.
@@ -76,7 +76,7 @@ Background: Vision-Language Models
 
 
 VLMs are strong zero-shot learners
----------------------------
+~~~~~~~~~~
 
 
 | Recent VLM research has focused on zero and few shot performance on
@@ -89,7 +89,7 @@ VLMs are strong zero-shot learners
 | Performance highly-dependent on choice of prompt
 
 Our approach:
----------------------------
+~~~~~~~~~~
 
 
 | Design prompts for the variables we are interested in (for now screens
@@ -110,7 +110,7 @@ vision/language tasks
 
 
 Potential options:
----------------------------
+~~~~~~~~~~
 
 
 | We can train the model and use it to label the vape data

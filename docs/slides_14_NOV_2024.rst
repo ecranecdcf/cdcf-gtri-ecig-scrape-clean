@@ -9,7 +9,7 @@ Agenda November 14, 2024
 
 
 Data gathering and preparation
----------------------------
+~~~~~~~~~~
 
 | Planning to re-run the scraping to get categories/parent links from
   the sites
@@ -20,7 +20,7 @@ Data gathering and preparation
 
 
 NLP Updates
----------------------------
+~~~~~~~~~~
 
 | Iteratively improved PRODUCT TYPE classification (72% -> 78%) on
   sample test set
@@ -35,7 +35,7 @@ NLP Updates
 
 
 NLP Updates SCREEN variable
----------------------------
+~~~~~~~~~~
 
 | Initial scan with GPT to determine patterns around screen and displays
 | Vapewh, vapesourcing, perfect vape, cs vape, vaping.com, vape.com, my
@@ -53,7 +53,7 @@ NLP Updates SCREEN variable
 
 
 NLP Updates SCREEN variable
----------------------------
+~~~~~~~~~~
 
 | Should be able to be identified with regular expressions now that we
   have the patterns.
@@ -76,11 +76,11 @@ NLP Updates SCREEN variable
 
 
 Computer Vision Updates
----------------------------
+~~~~~~~~~~
 
 
 YOLO Pre-Processing Updates
----------------------------
+~~~~~~~~~~
 
 | Last meeting we showed the results on the My Vape Store data with and
   without tuning on a part of the dataset.
@@ -97,7 +97,7 @@ YOLO Pre-Processing Updates
    :align: left
 
 YOLO Pre-Processing Updates Contd
----------------------------
+~~~~~~~~~~
 
 | When used for testing the model correctly classified 427 of the 436
   images with 8 false negatives (missed vape images) and 7 false
@@ -110,11 +110,11 @@ YOLO Pre-Processing Updates Contd
   for use by the VLM.
 
 Deployment Options for CV Models
----------------------------
+~~~~~~~~~~
 
 
 Model Deployment Background
----------------------------
+~~~~~~~~~~
 
 | After training a model, how do we make it useable?
 | Model deployment the process of exposing the trained model to
@@ -125,7 +125,7 @@ Model Deployment Background
 | Number of requests and latency
 
 Option 1: Push/Pull to/from Huggingface Hub 
----------------------------
+~~~~~~~~~~
 
 
 | Pros:
@@ -139,7 +139,7 @@ Option 1: Push/Pull to/from Huggingface Hub
   model
 
 Option 2: Cloud Services (e.g: AWS Sagemaker)
----------------------------
+~~~~~~~~~~
 
 
 | Pros:
@@ -153,7 +153,7 @@ Option 2: Cloud Services (e.g: AWS Sagemaker)
   of requests
 
 Option 3: Huggingface Inference Endpoints
----------------------------
+~~~~~~~~~~
 
 
 | Pros:
@@ -165,7 +165,7 @@ Option 3: Huggingface Inference Endpoints
 | Paid (relatively cheap, $0.5 per GPU hour)
 
 What do we recommend:
----------------------------
+~~~~~~~~~~
 
 
 | Inference endpoints are a simpler and more manageable version of
