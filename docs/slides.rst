@@ -1,5 +1,5 @@
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 0
    :caption: Slides
 
    slides_19_SEP_2024

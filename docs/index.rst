@@ -1,3 +1,4 @@
+
 .. CDCF E-Cigarette Scraping and Analysis documentation master file, created by
    sphinx-quickstart on Thu Dec 12 09:07:04 2024.
    You can adapt this file completely to your liking, but it should at least
@@ -29,6 +30,6 @@ Indices and tables
 * :ref:`search`
 
 .. toctree::
-   :hidden:
+   :maxdepth: 1
 
-   Slides <slides>
+   slides
