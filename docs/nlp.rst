@@ -46,13 +46,12 @@ NLP Features
      - `nlp/llm_code/datasets/output/processed_output`
      - Since data is not consistent across different sources, we are working to standardize it. LLM will assist in standardizing the data for easier parsing and storage.
    * - Screens
-     - A regular-expression based script to detect various screen features: display_type, color_display, touch_screen, curved_screen, battery_indicator, eliquid_indicator, smart_display, digital_display, hd_display, animated,backlit
+     - A regular-expression-based script to detect various screen features: display_type, color_display, touch_screen, curved_screen, battery_indicator, eliquid_indicator, smart_display, digital_display, hd_display, animated, backlit.
      - `nlp/screens.py`
      - `nlp/screens_sample_data`
-     - Does not capture all aspects of 'gaming' features, which will be part of another script.
+     - Does not capture all aspects of "gaming" features, which will be part of another script.
    * - Product Type
-     - Product is captured using llama. 
-     - Product type is captured using LLaMA-based classification. Categories include Closed Refills, Closed System, Disposable System, E-liquid, and Accessories. Further information can be found ``doc\Vape_Product_Categories.docx``
+     - Product type is captured using LLaMA-based classification. Categories include Closed Refills, Closed System, Disposable System, E-liquid, and Accessories. Further information can be found in `doc/Vape_Product_Categories.docx`.
      - `nlp/llm_code/llm_functions/classify_product`
      - `nlp/llm_code/datasets/output/processed_output`
      - Requires consistent labeling of categories and may need LLM fine-tuning for specific outliers or new product types. csvape and vapewh have labeled datasets for reference (`nlp/llm_code/datasets/labeled`).
@@ -75,7 +74,7 @@ NLP Features
      - Synthetic nicotine is detected using LLaMA-based classification to identify key terms (e.g., "tobacco-free nicotine").
      - `nlp/llm_code/llm_functions/classify_tfn`
      - `nlp/llm_code/datasets/output/processed_output`
-     - LLM captures most of edge cases--may need additional prompting if any new verbiage is found. csvape and vapewh have labeled datasets for reference (`nlp/llm_code/datasets/labeled`).
+     - LLM captures most of the edge cases--may need additional prompting if any new verbiage is found. csvape and vapewh have labeled datasets for reference (`nlp/llm_code/datasets/labeled`).
    * - Nicotine Free
      - Uses Nicotine Level to indicate if the product is nicotine free or not alongside relevant verbiage.
      - `nlp/llm_code/regex_functions/find_nic_free`
@@ -85,8 +84,6 @@ NLP Features
      - CBD/THC is detected using LLaMA-based classification. Zero-shot learning (no examples or additional training) has been successful in classifying CBD for products available.
      - `nlp/llm_code/llm_functions/classify_cbd`
      - `nlp/llm_code/datasets/output/processed_output`
-     - Larger test dataset may be useful to obtain more robust accuracy metric. csvape and vapewh have labeled datasets for reference (`nlp/llm_code/datasets/labeled`).
-
-
+     - Larger test dataset may be useful to obtain a more robust accuracy metric. csvape and vapewh have labeled datasets for reference (`nlp/llm_code/datasets/labeled`).
 
 

@@ -11,8 +11,9 @@ E-Cigarette Scraping and Analysis Documentation
    :caption: Contents:
 
    introduction
-   scraping
    data
+   scraping
+   meregedata
    nlp
    cv
    other

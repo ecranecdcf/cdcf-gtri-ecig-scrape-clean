@@ -1,9 +1,9 @@
 .. "CDCF ecig Documentation Page"
 
-Data Model and Preparation
-==========================
+Data Features
+=============
 
-Proposed data model. This is a work in progress.
+These are the key data features identified for data scraping, NLP, and computer vision analysis.
 
 .. list-table:: Data Model
    :widths: 20 15 65
