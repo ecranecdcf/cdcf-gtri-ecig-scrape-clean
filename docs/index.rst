@@ -7,6 +7,8 @@
 E-Cigarette Scraping and Analysis Documentation
 ===============================================
 
+The code repository can be found `here <https://github.com/ecranecdcf/cdcf-gtri-ecig-scrape-clean>`_ .
+
 .. toctree::
    :maxdepth: 2
    :caption: Main Topics
