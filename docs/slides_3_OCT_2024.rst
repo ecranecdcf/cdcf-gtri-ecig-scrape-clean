@@ -17,7 +17,7 @@ Data Gathering
 
 .. image:: images/103_1.png
    :alt: data gathering stats
-   :width: 66%
+   :width: 100%
    :align: left
 
 Data gathering
@@ -27,8 +27,6 @@ Data gathering
 | Data and code should be available in shared folder
 | Identified 30 other potential sites if needed (definitely more out
   there)
-
-Data gathering
 
 | https://www.huffandpuffers.com/
 | https://vaporboss.com/
@@ -68,10 +66,12 @@ Data cleaning
 | Sticking with previous structure from last time
 | Shared sample mipod data
 
+
 .. image:: images/103_2.png
    :alt: data model
-   :width: 66%
+   :width: 100%
    :align: left
+
 
 NLP Updates
 ===========
@@ -85,15 +85,16 @@ NLP Updates
 | Currently working on testing LLMs with fine-tuning
 | Screens will be next pass
 
-NLP Updates
 
 Image Processing Updates
 ========================
 
+
 .. image:: images/103_3.png
    :alt: vape images
-   :width: 66%
+   :width: 100%
    :align: left
+
 
 Image Processing
 ================
@@ -105,21 +106,24 @@ Image Processing
 | Working with a pre-existing trained model to find images of vapes (to
   filter out non-vapes, parts etc.) to filter down data set
 
-Image Processing
 
 Iced
 ====
 
+
 .. image:: images/103_4.png
    :alt: iced vapes
-   :width: 66%
+   :width: 100%
    :align: left
+
 
 Screens
 =======
 
+
 .. image:: images/103_5.png
    :alt: vapes with screens
-   :width: 66%
+   :width: 100%
    :align: left
+
   

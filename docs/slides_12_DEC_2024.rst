@@ -10,7 +10,6 @@ Agenda December 12, 2024
 | NLP updates
 | Deliverable updates
 
-Agenda December 12, 2024
 
 YOLO Pre-Processing Updates
 ===========================
@@ -29,7 +28,10 @@ YOLO Pre-Processing Updates
 | This new class allows for extracting images with vape juices to be
   passed to a VLM for further processing.
 
-YOLO Pre-Processing Updates
+.. image:: images/1212_1.png
+   :alt: vape liquids
+   :width: 100%
+   :align: left
 
 VLM Examples
 ============
@@ -45,7 +47,6 @@ VLM Examples
 | Naked 100, Crisp Menthol, 60ML, 3MG, Yes
 | VaporLax, cool mint, 30ml, 50mg, Yes
 
-VLM Examples
 
 VLM In-Context Learning
 =======================
@@ -62,7 +63,6 @@ VLM In-Context Learning
 | We are currently working on the example prompts and a test set we can
   use for testing this method.
 
-VLM In-Context Learning
 
 NLP 
 ====
@@ -83,7 +83,7 @@ NLP
   cases causing issues
 | Working to set up LLM for parsing
 
-NLP
+
 
 Gaming Variable
 ===============
@@ -101,7 +101,11 @@ Gaming Variable
 | Reward systems with medals and trophies, puff counters, etc.
 | We can build NLP to track these but still quite rare
 
-Gaming Variable
+.. image:: images/1212_2.png
+   :alt: gaming vape
+   :width: 100%
+   :align: left
+
 
 Consolidating Data
 ==================
@@ -125,7 +129,6 @@ Consolidating Data
   data
 | Documentation on what different columns mean (95 total columns!)
 
-Consolidating Data
 
 Deliverable Update
 ==================
@@ -144,4 +147,3 @@ Deliverable Update
   e-mail
 | Will be done by EOM
 
-Deliverable Update

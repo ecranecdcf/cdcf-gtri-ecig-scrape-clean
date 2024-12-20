@@ -12,19 +12,20 @@ Agenda October 17, 2024
 | Progress on TFN
 | Image classification
 
-Agenda October 17, 2024
 
 NLP Updates
 ===========
 
 Made progress on TFN
 
-NLP Updates
 
 TFN/CBD Samples
 ===============
 
-TFN/CBD Samples
+.. image:: images/1017_1.png
+   :alt: vapes tfn samples
+   :width: 100%
+   :align: left
 
 Computer Vision Model Updates
 =============================
@@ -39,7 +40,6 @@ Computer Vision Model Updates
 | Overall, is a more straightforward classification than screens so
   shouldnt be too much of a change
 
-Computer Vision Model Updates
 
 Image Cleaning
 ==============
@@ -56,12 +56,14 @@ Image Cleaning
   images to eliminate those that do not contain vapes as a
   pre-processing step for the VLM.
 
-Image Cleaning
 
 Prediction Examples
 ===================
 
-Prediction Examples
+.. image:: images/1017_2.png
+   :alt: prediction examples
+   :width: 100%
+   :align: left
 
 Background: Vision-Language Models
 ==================================
@@ -72,12 +74,10 @@ Background: Vision-Language Models
   images
 | They consist of an LLM backbone and a vision encoder/tokenizer
 
-Background: Vision-Language Models
 
 VLMs are strong zero-shot learners
 ==================================
 
-VLMs are strong zero-shot learners
 
 | Recent VLM research has focused on zero and few shot performance on
   various tasks
@@ -91,7 +91,6 @@ VLMs are strong zero-shot learners
 Our approach:
 =============
 
-Our approach:
 
 | Design prompts for the variables we are interested in (for now screens
   and iced)
@@ -104,10 +103,15 @@ Our approach:
 Flava is a VLM that can perform both multimodal and unimodal
 vision/language tasks
 
+.. image:: images/1017_3.png
+   :alt: vapes with screens
+   :width: 100%
+   :align: left
+
+
 Potential options:
 ==================
 
-Potential options:
 
 | We can train the model and use it to label the vape data
 | We can also deploy the model, allowing CDC groups to query in via an

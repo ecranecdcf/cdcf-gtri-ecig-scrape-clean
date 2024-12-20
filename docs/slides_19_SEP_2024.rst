@@ -8,7 +8,6 @@ Agenda September 19, 2024
 | Image classification
 | Project management
 
-Agenda September 19, 2024
 
 Data Gathering 
 ===============
@@ -18,7 +17,11 @@ Data Gathering
 | What we have so far (including provided by Elisha)
 | Element Vape is TBD
 
-Data Gathering
+.. image:: images/919_1.png
+   :alt: vapes with screens
+   :width: 100%
+   :align: left
+
 
 Data cleaning and preparation
 =============================
@@ -29,9 +32,6 @@ Data cleaning and preparation
 | Populated standard features using mipod product descriptions/extra
   columns
 
-Data cleaning and preparation
-
-.. _data-cleaning-and-preparation-1:
 
 Data cleaning and preparation
 =============================
@@ -39,7 +39,10 @@ Data cleaning and preparation
 | Will standardize other data sets to this format
 | Sample:
 
-Data cleaning and preparation
+.. image:: images/919_2.png
+   :alt: data cleaning sample
+   :width: 100%
+   :align: left
 
 Initial NLP Efforts
 ===================
@@ -57,7 +60,6 @@ Initial NLP Efforts
 | Screens, etc.
 | CBD, THC variables (seems like there may be less of these now)
 
-Initial NLP Efforts
 
 Image Classification
 ====================
@@ -73,4 +75,3 @@ Image Classification
 | Screens
 | Initial results are promising
 
-Image Classification

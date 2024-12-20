@@ -7,7 +7,6 @@ Agenda October 31, 2024
 | NLP
 | Image classification
 
-Agenda October 31, 2024
 
 Data Updates
 ============
@@ -15,8 +14,8 @@ Data Updates
 | We established a database for storing processed data.
 | It's not a strict requirement for future use, but will help us
   organize data better and could help with future analysis.
+  
 
-Data Updates
 
 NLP Updates
 ===========
@@ -29,7 +28,11 @@ NLP Updates
 | Product type
 | Iced (text only)
 
-NLP Updates
+.. image:: images/1031_1.png
+   :alt: tfn_samples
+   :width: 100%
+   :align: left
+
 
 NLP Results
 ===========
@@ -49,7 +52,6 @@ NLP Results
 | Further prompt engineering and few-shot learning should yield
   improvements
 
-NLP Results
 
 Additional NLP Updates
 ======================
@@ -58,27 +60,36 @@ Additional NLP Updates
 | Finish up 'Screens'
 | Working on flavors next
 
-Additional NLP Updates
 
 Datasets
 ========
 
-Datasets
+
 
 Deliverable README
 ==================
 
-Deliverable README
+.. image:: images/1031_2.png
+   :alt: vapes with screens
+   :width: 100%
+   :align: left
 
 Deliverable (initial NLP protoype)
 ==================================
 
-Deliverable (initial NLP protoype)
+.. image:: images/1031_3.png
+   :alt: vapes with screens
+   :width: 100%
+   :align: left
+
 
 Model Setup...
 ==============
 
-Model Setup...
+.. image:: images/1031_4.png
+   :alt: vapes with screens
+   :width: 100%
+   :align: left
 
 Image Pre-Processing Updates
 ============================
@@ -95,12 +106,14 @@ Image Pre-Processing Updates
 | This is not too surprising as the network has not seen just
   mouthpieces separately and can be tuned for this issue.
 
-Image Pre-Processing Updates
 
 Pre-Processing Results
 ======================
 
-Pre-Processing Results
+.. image:: images/1031_5.png
+   :alt: preprocessing samples
+   :width: 100%
+   :align: left
 
 Model Re-Training
 =================
@@ -115,14 +128,17 @@ Model Re-Training
 | This re-training reduced the percent of both false positives and false
   negatives which can be seen on the following slide.
 
-Model Re-Training
 
-.. _pre-processing-results-1:
+
 
 Pre-Processing Results
 ======================
 
-Pre-Processing Results
+
+.. image:: images/1031_6.png
+   :alt: preprocessing samples
+   :width: 100%
+   :align: left
 
 Other Vision Model Work
 =======================
@@ -140,4 +156,3 @@ Other Vision Model Work
   limits)
 | Also paid options but would require ongoing maintenance.
 
-Other Vision Model Work

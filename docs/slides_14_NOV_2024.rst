@@ -7,7 +7,6 @@ Agenda November 14, 2024
 | NLP updates
 | CV updates
 
-Agenda November 14, 2024
 
 Data gathering and preparation
 ==============================
@@ -18,14 +17,7 @@ Data gathering and preparation
 | Also working on unifying all the data into one model
 | Previously only done for mipod
 
-Data gathering and preparation
 
-NLP Updates
-===========
-
-NLP Updates
-
-.. _nlp-updates-1:
 
 NLP Updates
 ===========
@@ -41,7 +33,6 @@ NLP Updates
   variability
 | vapewh: Set up regex to parse as format is more consistent
 
-NLP Updates
 
 NLP Updates SCREEN variable
 ===========================
@@ -60,9 +51,6 @@ NLP Updates SCREEN variable
 | Animated
 | Backlit and Glow-in-the-dark
 
-NLP Updates SCREEN variable
-
-.. _nlp-updates-screen-variable-1:
 
 NLP Updates SCREEN variable
 ===========================
@@ -86,12 +74,10 @@ NLP Updates SCREEN variable
 | hd_display: ['High-definition']
 | animated: ['animation']
 
-NLP Updates SCREEN variable
 
 Computer Vision Updates
 =======================
 
-Computer Vision Updates
 
 YOLO Pre-Processing Updates
 ===========================
@@ -105,12 +91,13 @@ YOLO Pre-Processing Updates
 | This dataset contained 436 total images with 376 of these containing
   NO vapes while the remaining 60 contained at least a single vape.
 
-YOLO Pre-Processing Updates
+.. image:: images/1114_1.png
+   :alt: data gathering stats
+   :width: 100%
+   :align: left
 
 YOLO Pre-Processing Updates Contd
 =================================
-
-YOLO Pre-Processing Updates Contd
 
 | When used for testing the model correctly classified 427 of the 436
   images with 8 false negatives (missed vape images) and 7 false
@@ -125,12 +112,9 @@ YOLO Pre-Processing Updates Contd
 Deployment Options for CV Models
 ================================
 
-Deployment Options for CV Models
 
 Model Deployment Background
 ===========================
-
-Model Deployment Background
 
 | After training a model, how do we make it useable?
 | Model deployment the process of exposing the trained model to
@@ -143,7 +127,6 @@ Model Deployment Background
 Option 1: Push/Pull to/from Huggingface Hub 
 ============================================
 
-Option 1: Push/Pull to/from Huggingface Hub
 
 | Pros:
 | Free! All compute is done locally
@@ -158,7 +141,6 @@ Option 1: Push/Pull to/from Huggingface Hub
 Option 2: Cloud Services (e.g: AWS Sagemaker)
 =============================================
 
-Option 2: Cloud Services (e.g: AWS Sagemaker)
 
 | Pros:
 | Simplicity model can be queried with a simple script like any API
@@ -173,7 +155,6 @@ Option 2: Cloud Services (e.g: AWS Sagemaker)
 Option 3: Huggingface Inference Endpoints
 =========================================
 
-Option 3: Huggingface Inference Endpoints
 
 | Pros:
 | Simplicity of HF + flexibility of cloud
@@ -186,7 +167,6 @@ Option 3: Huggingface Inference Endpoints
 What do we recommend:
 =====================
 
-What do we recommend:
 
 | Inference endpoints are a simpler and more manageable version of
   AWS/GCP/Azure
