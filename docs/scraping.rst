@@ -24,6 +24,8 @@ Some of the original regular expression functions developed as a demo are availa
 Total Items Scraped
 -------------------
 
+Text fields are available in `scraped_data` directory. Images are available in via Box if needed, upon request.
+
 .. list-table:: Gathered Data
    :header-rows: 1
 
@@ -57,5 +59,8 @@ Total Items Scraped
    * - vaping.com
      - 1,202
      - 4,020
+   * - ElementVape
+     -
+     -
 
 Mipod provided by CDCF.
