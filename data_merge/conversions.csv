@@ -1,0 +1,54 @@
+﻿adjustable_airflow_bool,"adjustable, adjustable airflow, adjustable_airflow"
+adjustable_airflow,"airflow, airflow_description"
+has_battery,battery
+battery_description,"battery_description, battery_type, charging_description, charging_dock, disposable_vape_battery"
+bottle_capacity_ml,"bottle_capacity, ml, e-liquid contents, eliquid_contents"
+brand,"brand, main_brand"
+coil_description,"mesh coil, mesh, hardware_description, heating_element_description"
+coil_bool,"coil, coil_description"
+colors,"colors, colors_description, options_description"
+compare_price,compare_price
+made_in,"country_of_assembly, made_in"
+price,"current_price, price, regular_price, sale_price, money"
+description,"specifications_description, specifications_section, why_description"
+display_bool,display
+display_description,display_description
+disposable_bool,disposable
+dual_tank_bool,dual_tank
+external_features,external_features
+features,"features, pods_description, summary"
+flavor_description,flavor
+flavors,"flavor_list, flavor_options, flavor1, flavor2, flavor3, flavor4, flavor5, flavors, flavors_description"
+flavors_section,flavors_section
+formulation,formulation
+full_led_screen,full_led_screen
+iced_bool,iced_variable
+image_alt_text,image_alt_text
+image_url,image_url
+image_url_zoom,image_url_zoom
+image_urls,image_urls
+image2_alt_text,image2_alt_text
+image2_url,image2_url
+in_store_pickup,in_store_pickup
+ingredients,ingredients_description
+innovation_description,innovation_description
+internal_features,internal_features
+key_features_desription,key_features_description
+has_led,led
+url,"link, url, product_link"
+links_description,links_description
+name_change,"name change, name_description"
+nic_free_bool,nic_free
+nic_levels,"% nicotine, nicotine_level, nicotine_levels, nic_level_1, nic_level_2, nic_level_3"
+online_availbility ,online_availability
+operation,"operation, operation_description"
+package_contents_description,"package_contents, package_contents_description"
+power_mode_description,"power_mode_description, power_modes"
+product_name,"product, product_name, title"
+product_code,product_code
+product_id,product_id
+puff_count,"puff_count, puffs, puffs per device, puffs_description, puffs_per_device, puffs_per_device_normal"
+rechargeable_bool,rechargeable
+smart_led_bool,smart_led
+usb_bool,usb
+warnings,"warning, warnings, warning_description"
