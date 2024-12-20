@@ -7,13 +7,13 @@ E-Cigarette Scraping and Analysis Documentation
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    introduction
    data
    scraping
-   meregedata
+   mergedata
    nlp
    cv
    other
