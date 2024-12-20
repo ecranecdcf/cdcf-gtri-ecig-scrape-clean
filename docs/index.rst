@@ -31,4 +31,4 @@ Indices and tables
 .. toctree::
    :hidden:
 
-   slides
+   Slides <slides>

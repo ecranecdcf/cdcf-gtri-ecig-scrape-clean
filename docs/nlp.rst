@@ -43,7 +43,7 @@ NLP Features
    * - Flavors
      - Currently, flavors is captured using regex and completed for common patterns in vape.com and vapewh. We are in the process of implementing LLM prompting to extract the flavors. Flavors currently are stored in a dictionary data structure, with the key being the flavor name and value being the description.
      - `nlp/llm_code/regex_functions/extract_flavors_with_descriptions`, `nlp/flavor` (MyVaporStore)
-     - `nlp/llm_code/datasets/output/processed_output`
+     - `nlp/llm_code/datasets/output/processed_output`, `nlp/flavor/myvaporstore_flavors.csv`
      - Since data is not consistent across different sources, we are working to standardize it. LLM will assist in standardizing the data for easier parsing and storage.
    * - Screens
      - A regular-expression-based script to detect various screen features: display_type, color_display, touch_screen, curved_screen, battery_indicator, eliquid_indicator, smart_display, digital_display, hd_display, animated, backlit.
