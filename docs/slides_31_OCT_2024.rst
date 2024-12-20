@@ -9,7 +9,7 @@ Agenda October 31, 2024
 
 
 Data Updates
-============
+---------------------------
 
 | We established a database for storing processed data.
 | It's not a strict requirement for future use, but will help us
@@ -18,7 +18,7 @@ Data Updates
 
 
 NLP Updates
-===========
+---------------------------
 
 | Last meeting, we presented challenges/preliminary results on
   classification of TFN edge cases
@@ -35,7 +35,7 @@ NLP Updates
 
 
 NLP Results
-===========
+---------------------------
 
 | Prototypes were tested on vapewh and csvape. Further testing will be
   performed using additional datasets.
@@ -54,7 +54,7 @@ NLP Results
 
 
 Additional NLP Updates
-======================
+---------------------------
 
 | Finish up 'Iced'
 | Finish up 'Screens'
@@ -62,12 +62,12 @@ Additional NLP Updates
 
 
 Datasets
-========
+---------------------------
 
 
 
 Deliverable README
-==================
+---------------------------
 
 .. image:: images/1031_2.png
    :alt: vapes with screens
@@ -75,7 +75,7 @@ Deliverable README
    :align: left
 
 Deliverable (initial NLP protoype)
-==================================
+---------------------------
 
 .. image:: images/1031_3.png
    :alt: vapes with screens
@@ -84,7 +84,7 @@ Deliverable (initial NLP protoype)
 
 
 Model Setup...
-==============
+---------------------------
 
 .. image:: images/1031_4.png
    :alt: vapes with screens
@@ -92,7 +92,7 @@ Model Setup...
    :align: left
 
 Image Pre-Processing Updates
-============================
+---------------------------
 
 | Last meeting we showed results of YOLOv8 object detection on a public
   dataset of vape images.
@@ -108,7 +108,7 @@ Image Pre-Processing Updates
 
 
 Pre-Processing Results
-======================
+---------------------------
 
 .. image:: images/1031_5.png
    :alt: preprocessing samples
@@ -116,7 +116,7 @@ Pre-Processing Results
    :align: left
 
 Model Re-Training
-=================
+---------------------------
 
 | Due to the results we see in the previous slide it was clear the model
   needed to be tuned on this type of data.
@@ -132,7 +132,7 @@ Model Re-Training
 
 
 Pre-Processing Results
-======================
+---------------------------
 
 
 .. image:: images/1031_6.png
@@ -141,7 +141,7 @@ Pre-Processing Results
    :align: left
 
 Other Vision Model Work
-=======================
+---------------------------
 
 | Continueworking on fine-tuning the prompts
 | Experienced some overfitting so working on that

@@ -10,7 +10,7 @@ Agenda September 19, 2024
 
 
 Data Gathering 
-===============
+---------------------------
 
 | Trying to gather more data to have better data for models
 | Mostly reusable code
@@ -24,7 +24,7 @@ Data Gathering
 
 
 Data cleaning and preparation
-=============================
+---------------------------
 
 | Organized raw mipod data into standard features and identify relevant
   subcategories
@@ -34,7 +34,7 @@ Data cleaning and preparation
 
 
 Data cleaning and preparation
-=============================
+---------------------------
 
 | Will standardize other data sets to this format
 | Sample:
@@ -45,7 +45,7 @@ Data cleaning and preparation
    :align: left
 
 Initial NLP Efforts
-===================
+---------------------------
 
 | Coded NLP regex to extract and populate new features using Product
   Categories document from CDCF
@@ -62,7 +62,7 @@ Initial NLP Efforts
 
 
 Image Classification
-====================
+---------------------------
 
 | Starting with pre-trained models, fine-tuning as needed, examples:
 | https://github.com/openai/CLIP

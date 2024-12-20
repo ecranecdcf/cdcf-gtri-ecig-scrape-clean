@@ -12,7 +12,7 @@ Agenda December 12, 2024
 
 
 YOLO Pre-Processing Updates
-===========================
+---------------------------
 
 | Last meeting we discussed a final model for vape detection that was
   trained on 3 separate datasets, 2 of which were web scraped and
@@ -34,7 +34,7 @@ YOLO Pre-Processing Updates
    :align: left
 
 VLM Examples
-============
+---------------------------
 
 | I passed the images to the left to NVIDIAs new VLM asking the
   following question for each.
@@ -49,7 +49,7 @@ VLM Examples
 
 
 VLM In-Context Learning
-=======================
+---------------------------
 
 | In context learning involves interacting with the VLM and providing it
   examples of images and corresponding responses expected.
@@ -65,7 +65,7 @@ VLM In-Context Learning
 
 
 NLP 
-====
+---------------------------
 
 | Last time, we discussed iterative improvement of PRODUCT TYPE
   classification
@@ -86,7 +86,7 @@ NLP
 
 
 Gaming Variable
-===============
+---------------------------
 
 | Evaluated vapewh, vapesourcing, perfect_vape, csvape, vapingdotcom,
   vapedotcom, myvaporstore, getpop
@@ -108,7 +108,7 @@ Gaming Variable
 
 
 Consolidating Data
-==================
+---------------------------
 
 | Took scraped data from vapewh, vapesourcing, perfect_vape, csvape,
   vapingdotcom, vapedotcom, myvaporstore, getpop, elementvape and merged
@@ -131,7 +131,7 @@ Consolidating Data
 
 
 Deliverable Update
-==================
+---------------------------
 
 | Sync to github from our private gitlab is set up and will set to run
   regular updates

@@ -13,7 +13,7 @@ Agenda October 3, 2024
 Agenda October 3, 2024
 
 Data Gathering
-==============
+--------------
 
 .. image:: images/103_1.png
    :alt: data gathering stats
@@ -21,7 +21,7 @@ Data Gathering
    :align: left
 
 Data gathering
-==============
+--------------
 
 | Finishing up elementvape
 | Data and code should be available in shared folder
@@ -61,7 +61,7 @@ Data gathering
 | https://beyondvape.com/
 
 Data cleaning
-=============
+-------------
 
 | Sticking with previous structure from last time
 | Shared sample mipod data
@@ -74,7 +74,7 @@ Data cleaning
 
 
 NLP Updates
-===========
+-----------
 
 | Numeric values performing well with regular expressions
 | i.e. puffs per device, e-liquid contents, price, etc.
@@ -87,7 +87,7 @@ NLP Updates
 
 
 Image Processing Updates
-========================
+------------------------
 
 
 .. image:: images/103_3.png
@@ -97,7 +97,7 @@ Image Processing Updates
 
 
 Image Processing
-================
+----------------
 
 | Have initial pass at "iced" and "screen"
 | Going to test with additional data
@@ -108,7 +108,7 @@ Image Processing
 
 
 Iced
-====
+----
 
 
 .. image:: images/103_4.png
@@ -118,7 +118,7 @@ Iced
 
 
 Screens
-=======
+-------
 
 
 .. image:: images/103_5.png
