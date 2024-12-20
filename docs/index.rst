@@ -8,7 +8,7 @@ E-Cigarette Scraping and Analysis Documentation
 ===============================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Main Topics
 
    introduction
@@ -17,8 +17,17 @@ E-Cigarette Scraping and Analysis Documentation
    mergedata
    nlp
    cv
-   slides
    other
+
+
+Update Slides
+======
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Slides
+
+   slides
 
 
 
@@ -29,7 +38,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. toctree::
-   :maxdepth: 1
-
-   slides
