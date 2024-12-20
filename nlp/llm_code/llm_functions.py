@@ -120,72 +120,67 @@ def classify_cbd(pipe, text):
     except Exception as e:
         return f"Error during classification: {e}"
     
-def classify_iced(pipe, text):
+def classify_flavor(pipe, text):
+    # Flavors can be very long--
+    max_tokens = len(text.split()) * 2
+
     try:
-#         prompt = f"""
-#             [INST] <<SYS>> 
-#             You analyze text to determine if the product's description terms related to "icy". You will receive text of a product's description. If it contains synonyms, return True. If it does not contain any synonyms, return False.
-#             <</SYS>> [/INST]
-            
-#             [INST]
-#             Frozen, freeze
-#             [/INST]
-#             True - trigger terms: "frozen", "freeze"
-            
-#             [INST]
-#             Mint, Spearmint, Peppermint
-#             [/INST]
-#             True - trigger terms: "Mint", "Spearmint", "Peppermint"
-            
-#             [INST]
-#             Cool, cooling, chill, chilling
-#             [/INST]
-#             True - trigger terms: "cool", "cooling", "chill", "chilling"
-            
-#             [INST]
-#             Menthol
-#             [/INST]
-#             True - trigger terms: "menthol"
-                    
-#             [INST]
-#             {text}
-#             [/INST]
-#         """
         prompt = f"""
-        The following text consists of the name and a description for an e-cigarette product. Based on the text, does this e-cigarette produce a cooling sensation when used? Look for key words like 'mint,' 'icy,' 'menthol,' or similar words in the text. If these features are present in  the text, answer with yes. If not, answer with no. If the text doesn't describe an e-cigarette, answer with no.
-        
-        [INST]
-        {text}
-        [/INST]
+            [INST] <<SYS>> 
+            You are an expert in parsing vape product descriptions. Extract flavors, their descriptions, and whether they include menthol or cooling indicators in a structured JSON format.
+            <</SYS>> 
+            Extract flavors from the following text and format the output as a JSON array with "flavor", "description", and "ice" (true/false based on cooling indicators). 
+
+            Text: "{text}"
+            [/INST]
         """
-        outputs = pipe(prompt, max_new_tokens=64, do_sample=False)
+
+        outputs = pipe(prompt, max_new_tokens=max_tokens, do_sample=False)
         response = outputs[0]["generated_text"].strip()
         return response
 
     except Exception as e:
         return f"Error during classification: {e}"
-
+    
 def classify_product(pipe, text):
     try:
         prompt = f"""
             [INST] <<SYS>> 
-            You analyze text to determine the product type based on categories below. You will receive text of a product's name and description.  
+            Classify the product using the description into one of the following categories:
             
-            If it is a prefilled cartridge (including tanks, cartridges, pods for e-cigarette devices, JUUL pods, Logic Pro Tanks) that is not intended to be refilled after liquid depleted, return: 
-                {{"product_class": "Closed Refills"}}
-            If it is a closed system (including rechargeable devices/kits intended to be used with prefilled cartridges, JUUL system, VUSE Solo system) that is sold by itself without additional cartridges, return:
-                {{"product_class": "Closed System"}}
-            If it is a disposable device (including Puff Bar, VGOD STIG, Elfbar) that is non-reusable e-cigarette device and is not intended to be refilled with e-liquid after depletion (once e-liquid has been consumed), return:
-                {{"product_class": "Disposable System"}}
-            If it is an e-liquid container used in e-cigarette devices (typically conaining humectant such as propylene glycol, nicotine ,and flavoring Vape Craft 120ML bottles), return:
-                {{"product_class": "E-liquid"}}
-            If it is an accessory or part (including battery, charger, device sold without e-liquids such as Ooze Slim Pen), return:
-                {{"product_class": "Accessories"}}
-            <</SYS>> [/INST]
-            
+            - **CLOSED REFILL**: Prefilled cartridges or pods that are not refillable after use with volume less than 5 mL.
+            - **CLOSED SYSTEM**: A vape device or starter kit that uses replaceable, prefilled pods or cartridges.
+            - **OPEN SYSTEM**: A refillable vape product or starter kit with a tank or cartridge that allows users to manually add their choice of e-liquid. Description may include an e-liquid capacity, battery capacity, and a refillable pod or tank.
+            - **E-LIQUID**: Bottles of liquid used to refill tanks or pods with volume greater than 10 mL.
+            - **DISPOSABLE**: Single-use vaping device that is disposable and non-reusable after e-liquid is depleted. These are advertised with an associated puff count or puffs per device.
+            - **ACCESSORY**: Components like chargers, mesh coils, batteries, and REPLACEMENT pods or tanks (may have a coil or sub-ohm capacity). 
+
+            Return the result in JSON format, e.g., {{"product_class": "E-LIQUID"}}.
+
+            Examples:
+
+            [INST]
+            Title: Replacement pod  
+            Description: Replacement tank for XYZ device, empty pod  
+            [/INST]
+            {{"product_class": "ACCESSORY"}}
+
+            [INST]
+            Title: Disposable vape  
+            Description: 5000 puffs, flavored device, single-use  
+            [/INST]
+            {{"product_class": "DISPOSABLE"}}
+
+            [INST]
+            Title: Refillable vape kit  
+            Description: Starter kit with refillable pods, 2 mL tank, and 900 mAh battery  
+            [/INST]
+            {{"product_class": "OPEN SYSTEM"}}
+
             [INST]
             {text}
             [/INST]
+            <</SYS>> [/INST]
         """
         outputs = pipe(prompt, max_new_tokens=128, do_sample=False)
         response = outputs[0]["generated_text"].strip()
@@ -194,7 +189,6 @@ def classify_product(pipe, text):
     except Exception as e:
         return f"Error during classification: {e}"
     
-
 def classify_dataset(pipe, data, flag=False):
     # Initialize 'classified' as a DataFrame with the 'all_text' column from 'data'
     classified = pd.DataFrame(data['all_text'])
@@ -202,16 +196,22 @@ def classify_dataset(pipe, data, flag=False):
     raw_llm = '_raw_llm'
 
     # Determine the classification function and column name based on flag
-    if flag == 'iced':
-        classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_iced(pipe, x))
-    elif flag == 'tfn':
+    if flag == 'tfn':
         classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_tfn(pipe, x))
     elif flag == 'cbd':
         classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_cbd(pipe, x))
     elif flag == 'product_type':
-        classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_product(pipe, x))
+        classified[flag + raw_llm] = data.apply(
+            lambda row: classify_product(pipe, f"{row['title']}\n{row['description']}"), axis=1
+        )
+    elif flag =='flavor':
+        # Checking if regex processed flavors already
+        classified[flag + raw_llm] = data.apply(
+            lambda row: classify_flavor(pipe, row['all_text']) if not row['flavor_extracted'] else None,
+            axis=1
+        )
     else:
-        raise ValueError("Invalid flag specified. Use 'iced', 'tfn', 'cbd', or 'product_type'.")
+        raise ValueError("Invalid flag specified. Use 'tfn', 'cbd', or 'product_type'.")
 
     return classified
 
@@ -235,7 +235,7 @@ def extract_llm(row, llm_flag):
         elif llm_flag == "product_type":
             # Pattern to find product_class within <<ANS>> ... [ANS] section if it exists
             ans_pattern = re.compile(
-                r"<<ANS>>.*?[\'\"]product_class[\'\"]\s*:\s*\"(Closed Refills|Closed System|Disposable System|E-liquid|Accessories)\".*?\[ANS\]", 
+                r"<<ANS>>.*?[\'\"]product_class[\'\"]\s*:\s*\"(CLOSED REFILL|CLOSED SYSTEM|DISPOSABLE|OPEN SYSTEM|E-LIQUID|ACCESSORY)\".*?\[ANS\]", 
                 re.DOTALL
             )
 
@@ -247,7 +247,7 @@ def extract_llm(row, llm_flag):
             # If no match within <<ANS>> ... [ANS], search for the first occurrence after the first_line
             if first_line in text:
                 general_pattern = re.compile(
-                    rf'{re.escape(first_line)}.*?[\'\"]product_class[\'\"]\s*:\s*\"(Closed Refills|Closed System|Disposable System|E-liquid|Accessories)\"', 
+                    rf'{re.escape(first_line)}.*?[\'\"]product_class[\'\"]\s*:\s*\"(CLOSED REFILL|CLOSED SYSTEM|DISPOSABLE|OPEN SYSTEM|E-LIQUID|ACCESSORY)\"', 
                     re.DOTALL
                 )
                 match = general_pattern.search(text)
