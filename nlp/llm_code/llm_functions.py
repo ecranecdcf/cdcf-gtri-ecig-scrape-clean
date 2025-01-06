@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 import torch
 import os
 import re
+from tqdm import tqdm
 
 # Initialize the LLaMA model using pretrained parameters from the transformers library of HuggingFace
 def init_llama_model(model_dir):
@@ -16,7 +17,10 @@ def init_llama_model(model_dir):
         model = AutoModelForCausalLM.from_pretrained(model_dir, torch_dtype=torch.bfloat16)
         
         # Avoid warning msg about pad token id
+        tokenizer.pad_token_id = tokenizer.eos_token_id
         model.config.pad_token_id = model.config.eos_token_id
+        model.generation_config.temperature=None
+        model.generation_config.top_p=None
         
         # Create the pipeline for text generation
         pipe = pipeline(
@@ -43,21 +47,23 @@ def load_csv_data(file_path):
     data = pd.read_csv(file_path, usecols=lambda column: 'Unnamed' not in column)
     return data
 
-# Preprocessing steps as needed
+# Preprocessing steps
+### JPJ: We may not need this if preprocessing is performed prior to data ingestion
 def preprocess_data(data):
-    data.fillna("", inplace=True)  # add more preprocessing steps as needed
-    return data
+    # Replace NaN for object columns
+    data.loc[:, data.select_dtypes(include=["object"]).columns] = data.select_dtypes(include=["object"]).fillna("")
+    # Replace NaN for numeric columns with 0 or another default
+    data.loc[:, data.select_dtypes(include=["float64"]).columns] = data.select_dtypes(include=["float64"]).fillna(0)
+    return data    
 
 # Classify scraped data for the TFN variable
 def classify_tfn(pipe, text):
     try:
         # Prompt contains few shot learning to prime LLM with edge cases it may struggle with
         prompt = f"""
-            [INST]
-            <<SYS>>
+            [INST] <<SYS>>
             You are an analyst that determines if a product is tobacco-free or synthetic nicotine. You will receive a product description. If it is a CBD/THC product, return N/A. If it is tobacco-free or uses synthetic nicotine, output true with the phrase or word that indicates this. If it is not, return False. 
-            <</SYS>>
-            [/INST]
+            <</SYS>> [/INST]
             
             [INST]
             Synthetic Nicotine
@@ -80,7 +86,7 @@ def classify_tfn(pipe, text):
             True - trigger term: "TFN"
             
             [INST]
-            Experience the pinnacle of vaping technology with the Lost Mary MO20000 Pro Disposable Vape. This cutting-edge device boasts an impressive 18mL prefilled capacity with premium nic salts, delivering a satisfying 0% (0mg) or 5% (50mg) nicotine strength. Equipped with dual 0.9ohm mesh coils, it ensures consistent and flavorful vapor production with every puff. 
+            0% (0mg) of nicotine.
             [/INST]
             False - no trigger terms
             
@@ -89,7 +95,7 @@ def classify_tfn(pipe, text):
             [/INST]
             """
         # Set 256 max tokens due to length of some of the scraped product descriptions
-        outputs = pipe(prompt, max_new_tokens=256, do_sample=False)
+        outputs = pipe(prompt, max_new_tokens=128, do_sample=False)
         response = outputs[0]["generated_text"].strip()
         return response
 
@@ -113,7 +119,7 @@ def classify_cbd(pipe, text):
             [/INST]
         """
 
-        outputs = pipe(prompt, max_new_tokens=64, do_sample=False)
+        outputs = pipe(prompt, max_new_tokens=32, do_sample=False)
         response = outputs[0]["generated_text"].strip()
         return response
 
@@ -128,10 +134,11 @@ def classify_flavor(pipe, text):
         prompt = f"""
             [INST] <<SYS>> 
             You are an expert in parsing vape product descriptions. Extract flavors, their descriptions, and whether they include menthol or cooling indicators in a structured JSON format.
-            <</SYS>> 
+            <</SYS>> [/INST]
             Extract flavors from the following text and format the output as a JSON array with "flavor", "description", and "ice" (true/false based on cooling indicators). 
-
-            Text: "{text}"
+            
+            [INST]
+            "{text}"
             [/INST]
         """
 
@@ -143,6 +150,8 @@ def classify_flavor(pipe, text):
         return f"Error during classification: {e}"
     
 def classify_product(pipe, text):
+    # Closed cartridges should mention pods while disposables will not mention pods at all
+    # 
     try:
         prompt = f"""
             [INST] <<SYS>> 
@@ -155,40 +164,36 @@ def classify_product(pipe, text):
             - **DISPOSABLE**: Single-use vaping device that is disposable and non-reusable after e-liquid is depleted. These are advertised with an associated puff count or puffs per device.
             - **ACCESSORY**: Components like chargers, mesh coils, batteries, and REPLACEMENT pods or tanks (may have a coil or sub-ohm capacity). 
 
-            Return the result in JSON format, e.g., {{"product_class": "E-LIQUID"}}.
-
-            Examples:
-
-            [INST]
-            Title: Replacement pod  
-            Description: Replacement tank for XYZ device, empty pod  
-            [/INST]
-            {{"product_class": "ACCESSORY"}}
+            Return the product classification.
+            <</SYS>> [/INST]
 
             [INST]
-            Title: Disposable vape  
-            Description: 5000 puffs, flavored device, single-use  
+            Replacement pod, replacement tank, empty pod, or empty tank
             [/INST]
-            {{"product_class": "DISPOSABLE"}}
+            ACCESSORY
 
             [INST]
-            Title: Refillable vape kit  
-            Description: Starter kit with refillable pods, 2 mL tank, and 900 mAh battery  
+            Disposable vape, single-use vape, puff count, puffs per device
             [/INST]
-            {{"product_class": "OPEN SYSTEM"}}
+            DISPOSABLE
+
+            [INST]
+            Refillable vape kit, starter kit with refillable pods or tank  
+            [/INST]
+            OPEN SYSTEM
 
             [INST]
             {text}
             [/INST]
-            <</SYS>> [/INST]
+             
         """
-        outputs = pipe(prompt, max_new_tokens=128, do_sample=False)
+        outputs = pipe(prompt, max_new_tokens=64, do_sample=False)
         response = outputs[0]["generated_text"].strip()
         return response
 
     except Exception as e:
         return f"Error during classification: {e}"
-    
+
 def classify_dataset(pipe, data, flag=False):
     # Initialize 'classified' as a DataFrame with the 'all_text' column from 'data'
     classified = pd.DataFrame(data['all_text'])
@@ -197,22 +202,26 @@ def classify_dataset(pipe, data, flag=False):
 
     # Determine the classification function and column name based on flag
     if flag == 'tfn':
-        classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_tfn(pipe, x))
+        classified[flag + raw_llm] = [
+            classify_tfn(pipe, x) for x in tqdm(data['all_text'], desc=f"Classifying {flag.upper()}")
+        ]
     elif flag == 'cbd':
-        classified[flag + raw_llm] = data['all_text'].apply(lambda x: classify_cbd(pipe, x))
+        classified[flag + raw_llm] = [
+            classify_cbd(pipe, x) for x in tqdm(data['all_text'], desc=f"Classifying {flag.upper()}")
+        ]
     elif flag == 'product_type':
-        classified[flag + raw_llm] = data.apply(
-            lambda row: classify_product(pipe, f"{row['title']}\n{row['description']}"), axis=1
-        )
-    elif flag =='flavor':
-        # Checking if regex processed flavors already
-        classified[flag + raw_llm] = data.apply(
-            lambda row: classify_flavor(pipe, row['all_text']) if not row['flavor_extracted'] else None,
-            axis=1
-        )
+        classified[flag + raw_llm] = [
+            classify_product(pipe, f"{row['title']}\n{row['description']}")
+            for _, row in tqdm(data.iterrows(), desc="Classifying Product Type", total=len(data))
+        ]
+    elif flag == 'flavor':
+        classified[flag + raw_llm] = [
+            classify_flavor(pipe, row['all_text']) if not row['flavor_extracted'] else None
+            for _, row in tqdm(data.iterrows(), desc="Classifying Flavor", total=len(data))
+        ]
     else:
-        raise ValueError("Invalid flag specified. Use 'tfn', 'cbd', or 'product_type'.")
-
+        raise ValueError("Invalid flag specified. Use 'tfn', 'cbd', 'product_type', or 'flavor'.")
+    
     return classified
 
 def save_classified_data(data, output_path):
@@ -221,39 +230,25 @@ def save_classified_data(data, output_path):
 
 ### Extracting LLM response
 def extract_llm(row, llm_flag):
-        first_line = row['all_text'].splitlines()[0]  # Extract the first line from 'description' column
-        text = row[llm_flag + "_raw_llm"]
-        if llm_flag == 'tfn' or llm_flag == 'cbd' or llm_flag == 'iced':
-            # Check if the first line appears in the text
-            if first_line in text:
-                # Create a regex pattern to match [/INST] followed by specific content and capture it
-                pattern = re.compile(rf'{re.escape(first_line)}.*?\[/INST\]\s*(.*?)(?:\n|$)', re.DOTALL)
-                match = pattern.search(text)
+    first_line = row['all_text'].splitlines()[0]  
+    text = row[llm_flag + "_raw_llm"]
 
-                if match:
-                    return match.group(1).strip()
-        elif llm_flag == "product_type":
-            # Pattern to find product_class within <<ANS>> ... [ANS] section if it exists
-            ans_pattern = re.compile(
-                r"<<ANS>>.*?[\'\"]product_class[\'\"]\s*:\s*\"(CLOSED REFILL|CLOSED SYSTEM|DISPOSABLE|OPEN SYSTEM|E-LIQUID|ACCESSORY)\".*?\[ANS\]", 
-                re.DOTALL
-            )
+    if first_line not in text:
+        return None 
+    
+    if llm_flag in {'tfn', 'cbd', 'product_type'}:
+        pattern = re.compile(rf'{re.escape(first_line)}.*?\[/INST\]\s*(.*?)(?:\n|$)', re.DOTALL)
+    else:
+        return None  # Return None for unsupported flags
 
-            # First, attempt to find product_class within the <<ANS>> ... [ANS] section
-            ans_match = ans_pattern.search(text)
-            if ans_match:
-                return f'{{"product_class": "{ans_match.group(1)}"}}'
+    match = pattern.search(text)
+    if not match:
+        return None  # Return None if no match is found
 
-            # If no match within <<ANS>> ... [ANS], search for the first occurrence after the first_line
-            if first_line in text:
-                general_pattern = re.compile(
-                    rf'{re.escape(first_line)}.*?[\'\"]product_class[\'\"]\s*:\s*\"(CLOSED REFILL|CLOSED SYSTEM|DISPOSABLE|OPEN SYSTEM|E-LIQUID|ACCESSORY)\"', 
-                    re.DOTALL
-                )
-                match = general_pattern.search(text)
-                return f'{{"product_class": "{match.group(1)}"}}' if match else None
-        
-        return None
+    # Process the match based on llm_flag
+    if llm_flag in {'tfn', 'cbd', 'product_type'}:
+        return match.group(1).strip()
+    return None
 
 # Usage Example
 if __name__ == "__main__":
