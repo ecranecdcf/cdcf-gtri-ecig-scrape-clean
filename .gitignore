@@ -103,3 +103,7 @@ coverage.xml
 .RData
 .Ruserdata
 
+# LLM Trials
+./datasets/output/processed_output/archive/
+./datasets/output/raw_output/archive/
+
