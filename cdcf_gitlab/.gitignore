@@ -1,0 +1,113 @@
+.idea/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon?
+._*
+
+# Thumbnails
+._.DS_Store
+.DS_Store
+**/._*
+
+# macOS-specific files
+.DS_Store
+.Spotlight-V100
+.Trashes
+.DS_Store?
+.env
+
+# Python-specific
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+*.egg
+*.log
+*.pot
+*.pyc
+
+# Virtual environments
+.vscode/
+pip-wheel-metadata/
+*.py[cod]
+*.whl
+
+# Jupyter Notebook-specific
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+*.ipynb~ # Temporary notebook files
+*.nbconvert/
+
+# JupyterLab specific
+.jupyter/
+.jupyter/lab/
+
+# R-specific
+.Rhistory
+.Rproj.user/
+*.Rproj
+*.Rhistory
+.RData
+.Ruserdata
+.Ruser
+
+# Jupyter extensions
+/.local/share/jupyter/lab
+/.local/share/jupyter/runtime
+/.local/share/jupyter/notebook
+
+# General cache and temp files
+*.bak
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+*.cache
+*.orig
+*.rej
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# dotenv
+.env
+.env.*
+
+# RStudio-specific
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# LLM Trials
+./datasets/output/processed_output/archive/
+./datasets/output/raw_output/archive/
+
