@@ -1,3 +1,5 @@
+.idea/
+
 # macOS
 .DS_Store
 .AppleDouble
@@ -17,6 +19,7 @@ Icon?
 .Spotlight-V100
 .Trashes
 .DS_Store?
+.env
 
 # Python-specific
 __pycache__/
@@ -25,6 +28,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 dist/

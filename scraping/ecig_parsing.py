@@ -20,6 +20,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv(os.path.join(os.getcwd(), ".env"))
+
 section_strings_raw = {
     'Display Screen': 'screen',
     'Charging': 'charging',
@@ -615,6 +621,45 @@ Salted caramel'''
 words = '|'.join(list(set(flavors.split('\n'))))
 flavor_regex = re.compile('({})'.format(words), flags=re.IGNORECASE)
 
+def extract_options(soup, header_name):
+    options = []
+    header = soup.find('span', text=header_name)
+    if header:
+        # Find the next div with the class 'block-swatch-list' containing the options
+        option_div = header.find_next('div', class_='block-swatch-list')
+        if option_div:
+            inputs = option_div.find_all('input', class_='block-swatch__radio')
+            for option in inputs:
+                options.append(option['value'])
+    return options
+
+def extract_salt_nic_val_and_unit(input_string):
+    """
+    Parses strings like "50mg (5%)" and returns a list of tuples.
+    """
+    matches = re.findall(r'(\d+(?:\.\d+)?)([a-zA-Z%]+)', input_string)
+    return [(float(num), unit) for num, unit in matches]
+
+def extract_value_and_unit(text):
+    # Define the regular expression pattern
+    pattern = r'(?P<value>\d*\.?\d+)\s*(?P<unit>[a-zA-Z/]+)'
+    
+    # Find all matches in the text
+    matches = re.finditer(pattern, text)
+    
+    # Initialize lists to store extracted values and units
+    values = []
+    units = []
+    
+    # Iterate over matches to extract values and units
+    for match in matches:
+        value = float(match.group('value'))
+        unit = match.group('unit').strip()
+        values.append(value)
+        units.append(unit)
+    
+    return values, units
+
 
 
 def parse_description_sections(desc_section, all_headers, header_samples, full_link):
@@ -795,33 +840,51 @@ def parse_description_sections(desc_section, all_headers, header_samples, full_l
 
 
 # Function to download and save an image
-def download_image(url, tag, save_dir='getpop_images'):
+def download_image(url, tag, save_dir='getpop_images', alt=''):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0'
     }
+    image_info = dict()
+    main_dir = os.getenv('BOX_DIR')
+    final_dir = os.path.join(main_dir, save_dir)
     # Create the directory if it doesn't exist
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+    if not os.path.exists(final_dir):
+        os.makedirs(final_dir)
     image_extension = url.split('.')[-1].split('?')[0].split(':')[0]  # Extract file extension from URL
-    save_path = os.path.join(save_dir, f'{tag}.{image_extension}')
-    if os.path.exists(save_path):
-        #print(f"File already exists at {save_path}. Skipping download.")
-        return
+    save_path = os.path.join(final_dir, f'{tag}.{image_extension}')
+    # if os.path.exists(save_path):
+    #     #print(f"File already exists at {save_path}. Skipping download.")
+    #     return
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # Check for request errors
         img = Image.open(BytesIO(response.content))
         img.save(save_path)
+        image_info['url'] = url
+        image_info['path'] = save_path
+        image_info['alt'] = alt
         #print(f"Image saved: {save_path}")
     except Exception as e:
         print(f"Failed to download {url}: {e}")
+    return image_info
         
-puff_regex = re.compile('([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][,][0-9][0-9][0-9]) puffs', flags=re.IGNORECASE)
-nico_regex = re.compile('([1-9]\.[0-9][0-9]|[1-9][0-9]|[0-9]) ?%? ?nicotine', flags=re.IGNORECASE)
-nico_regex2 = re.compile('([1-9]\.[0-9][0-9]|[1-9][0-9]|[0-9]) ?%? ?salt nicotine', flags=re.IGNORECASE)
+puff_regex = re.compile(r'(?:puff(?:s?\s*count)?:\s*)?(\d+(?:,\d+)?(?:-\d+)?(?:k)?(?:[+]?))(?:\s*puffs?)', flags=re.IGNORECASE)
+nico_regex = re.compile(r'([1-9]\.[0-9]{1,2}|[1-9][0-9]|[0-9])\s*(?:%|mg/ml)', flags=re.IGNORECASE)
+nico_regex2 = re.compile(r'(?:salt\s*nicotine:\s*)?([1-9]\.[0-9]{1,2}|[1-9][0-9]|[0-9])\s*%?\s*salt\s*nicotine?', flags=re.IGNORECASE)
 device_regex = re.compile('(disposable|rechargeable|battery|mesh coil|USB|Adjustable Airflow)', flags=re.IGNORECASE)
-ml_regex = re.compile('([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][,][0-9][0-9][0-9]) ?ml', flags=re.IGNORECASE)
+ml_regex = re.compile(r'(\d+(?:,\d{3})?)\s*ml', flags=re.IGNORECASE)
+battery_regex = re.compile(r'(?:battery\s*(?:capacity)?:?\s*)?(\d+)\s*mah', flags=re.IGNORECASE)
 
+
+def extract_battery(txt):
+    battery = ''
+    battery_ = battery_regex.search(txt)
+    if battery_:
+        battery = battery_.group(1)
+
+    if len(battery) > 0 and 'mah' not in battery.lower():
+        battery += 'mAh'
+    return battery
 
 def find_features(txt, section=None):
     p_text = ''
@@ -906,17 +969,17 @@ def features_to_cats(feats):
                 ft = ft.lower()
                 #disposable','rechargeable','battery','mesh coil','USB','Adjustable Airflow',
                 if 'disposable' == ft:
-                    disposable = 'TRUE'
+                    disposable = True
                 if 'rechargeable' == ft:
-                    recharge = 'TRUE'
+                    recharge = True
                 if 'battery' == ft:
-                    battery = 'TRUE'
+                    battery = True
                 if 'mesh coil' == ft:
-                    mesh = 'TRUE'
+                    mesh = True
                 if 'usb' == ft:
-                    usb = 'TRUE'
+                    usb = True
                 if 'adjustable airflow' == ft:
-                    adjustable = 'TRUE'
+                    adjustable = True
     found_flavs = sorted(list(set(found_flavs)))
 
     if len(found_flavs) == 5:
