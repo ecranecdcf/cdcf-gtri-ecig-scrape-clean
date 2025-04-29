@@ -3,7 +3,7 @@ import re
 
 
 def csvape():
-    with open('csvape.html', 'r') as rf:
+    with open('scraping/prep/csvape.html', 'r') as rf:
         html_content = rf.read()
     soup = BeautifulSoup(html_content, 'html.parser')
     links = soup.find_all('a', href=True)
