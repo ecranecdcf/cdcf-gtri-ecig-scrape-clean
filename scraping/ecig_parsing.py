@@ -841,6 +841,12 @@ def parse_description_sections(desc_section, all_headers, header_samples, full_l
 
 # Function to download and save an image
 def download_image(url, tag, save_dir='getpop_images', alt=''):
+    if not url:
+        print("No URL provided for image download.")
+        return None
+    if not tag:
+        print("No tag provided for image download.")
+        return None
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0'
     }
@@ -859,6 +865,11 @@ def download_image(url, tag, save_dir='getpop_images', alt=''):
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # Check for request errors
         img = Image.open(BytesIO(response.content))
+
+        width, height = img.size
+        if width < 100 or height < 100:
+            print(f"Image {url} is too small ({width}x{height}). Skipping.")
+            return None
         img.save(save_path)
         image_info['url'] = url
         image_info['path'] = save_path
@@ -866,6 +877,7 @@ def download_image(url, tag, save_dir='getpop_images', alt=''):
         #print(f"Image saved: {save_path}")
     except Exception as e:
         print(f"Failed to download {url}: {e}")
+        return None
     return image_info
         
 puff_regex = re.compile(r'(?:puff(?:s?\s*count)?:\s*)?(\d+(?:,\d+)?(?:-\d+)?(?:k)?(?:[+]?))(?:\s*puffs?)', flags=re.IGNORECASE)

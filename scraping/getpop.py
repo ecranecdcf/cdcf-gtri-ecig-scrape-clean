@@ -29,7 +29,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from db.db import *
+from db.db_azure import *
 from ecig_parsing import *
 
 
@@ -37,52 +37,60 @@ BASE = 'https://getpop.co'
 company = GETPOP
 
 links = [
-    '/collections/disposables/0mg-nicotine',
-    '/collections/disposables/air-bar',
-    '/collections/disposables/candy',
-    '/collections/disposables/coffee',
-    '/collections/disposables/fruity',
-    '/collections/disposables/fume',
-    '/collections/disposables/geek-bar',
-    '/collections/disposables/hqd',
-    '/collections/disposables/hyde',
-    '/collections/disposables/ice',
-    '/collections/disposables/kado-bar',
-    '/collections/disposables/lost-mary',
-    '/collections/disposables/mint',
-    '/collections/disposables/raz',
-    '/collections/disposables/rechargeable',
-    '/collections/disposables/tobacco',
-    '/collections/disposables',
-    '/collections/e-liquids/Bakery',
-    '/collections/e-liquids/Drinks%2FBeverages',
-    '/collections/e-liquids/Fruity',
-    '/collections/e-liquids/Mint',
-    '/collections/e-liquids/Monster-Vape-Labs',
-    '/collections/e-liquids/Pod-Juice',
-    '/collections/e-liquids/Tobacco',
-    '/collections/e-liquids/VGOD',
-        '/collections/e-liquids',
-    '/collections/devices',
-    '/collections/pods',
-    '/collections/pod-systems',
-    '/collections/pod-systems/smok',
-    '/collections/pod-systems/uwell',
-    '/collections/pod-systems/vaporesso',
-    '/collections/pod-systems/voopoo',
-    '/collections/nicotine-pouches/chyl',
-    '/collections/nicotine-pouches/fume',
-    '/collections/nicotine-pouches/kado-bar',
-    '/collections/nicotine-pouches/lucy',
-    '/collections/nicotine-pouches/qit',
-    '/collections/nicotine-pouches/zyn',
-        '/collections/nicotine-pouches',
-    '/collections/back-in-stock',
-    '/collections/best-sellers',
-    '/collections/flavor-of-the-month',
-    '/collections/new-arrivals',
-    '/collections/under-10',
-    '/collections/all',
+     "/collections/disposables",
+    "/collections/disposables/hyde",
+    "/collections/disposables/fume",
+    "/collections/disposables/air-bar",
+    "/collections/disposables/hqd",
+    "/collections/disposables/geek-bar",
+    "/collections/disposables/lost-mary",
+    "/collections/disposables/kado-bar",
+    "/collections/disposables/raz",
+    "/collections/disposables/candy",
+    "/collections/disposables/coffee",
+    "/collections/disposables/fruity",
+    "/collections/disposables/ice",
+    "/collections/disposables/mint",
+    "/collections/disposables/tobacco",
+    "/collections/disposables/0mg-nicotine",
+    "/collections/disposables/rechargeable",
+    
+    # E-Liquids URLs
+    "/collections/e-liquids",
+    "/collections/e-liquids/Pod-Juice",
+    "/collections/e-liquids/VGOD",
+    "/collections/e-liquids/Monster-Vape-Labs",
+    "/collections/e-liquids/mint",
+    "/collections/e-liquids/fruity",
+    "/collections/e-liquids/tobacco",
+    "/collections/e-liquids/drinks%2Fbeverages",
+    "/collections/e-liquids/bakery",
+    
+    # Pod Systems URLs
+    "/collections/pod-systems",
+    "/collections/pod-systems/uwell",
+    "/collections/pod-systems/smok",
+    "/collections/pod-systems/vaporesso",
+    "/collections/pod-systems/voopoo",
+    "/collections/devices",
+    "/collections/pods",
+    
+    # Nicotine Pouches URLs
+    "/collections/nicotine-pouches",
+    "/collections/nicotine-pouches/zyn",
+    "/collections/nicotine-pouches/lucy",
+    "/collections/nicotine-pouches/kado-bar",
+    "/collections/nicotine-pouches/chyl",
+    "/collections/nicotine-pouches/fume",
+    "/collections/nicotine-pouches/qit",
+    
+    # Shop By Collection URLs
+    "/collections/back-in-stock",
+    "/collections/new-arrivals",
+    "/collections/best-sellers",
+    "/collections/flavor-of-the-month",
+    "/collections/under-10",
+    "/collections/all"
 ]
 
 print('TOTAL LINKS', len(links))
@@ -307,13 +315,13 @@ def main():
     
     with open(f'scraping/data-latest/{company}_scrape.csv', mode='w') as file:
         page = 1
-        for l in links:
+        for top_level_link in links:
             
             page = 1
-            site_section = l.replace('/collections/', '')
+            site_section = top_level_link.replace('/collections/', '')
 
             while True:
-                url = f'{BASE}{l}?page={page}'
+                url = f'{BASE}{top_level_link}?page={page}'
                 print(url)
 
                 if url in found:
@@ -516,7 +524,10 @@ def main():
                         n += 1
                         img = download_image(i['url'], tag, save_dir=f'data_from_sites_v2/{company}_images', alt=i['alt'])
                         # these seem to be the same
-                        images.append(img)
+                        if img:
+                            images.append(img)
+                        else:
+                            print(f'Image {i["url"]} failed to download for {tag}')
 
 
                     reviews = extract_reviews(psoup)
@@ -575,16 +586,6 @@ def main():
 
 
 
-                    if not has_header:
-                        # Create a DictWriter object
-                        writer = csv.DictWriter(file, fieldnames=product_data.keys())
-
-                        # Write the header (column names)
-                        writer.writeheader()
-                        
-                        has_header = True
-
-                    writer.writerow(product_data)
 
 
 if __name__ == "__main__":

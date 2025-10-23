@@ -11,6 +11,8 @@ import random
 import csv
 import sys
 import os
+import json
+import re
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -21,55 +23,323 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from db.db import *
+from db.db_azure import *
 from ecig_parsing import *
 
 
 BASE = 'https://csvape.com' # https://csvape.com/collections/7-daze-salt-nicotine
 
 links = [
-    '/collections/disposable-vapes',
-    '/collections/7-daze-eliquid',
-    '/collections/aqua-nicotine-salts-eliquids-1',
-    '/collections/coastal-clouds-salts',
-    '/collections/cuttwood-ejuice',
-    '/collections/dessert-flavors-e-liquid',
-    '/collections/ejuice',
-    '/collections/four-seasons-salts',
-    '/collections/fruity-flavors-e-liquid',
-    '/collections/glas-vapor-salt-nic',
-    '/collections/jam-monster-eliquids',
-    '/collections/jam-monster-salt-nic',
-    '/collections/kilo-ejuice',
-    '/collections/menthol-flavors-e-liquid',
-    '/collections/naked-100',
-    '/collections/pacha-mama',
-    '/collections/pacha-mama-ejuice-brands',
-    '/collections/reds-ejuice',
-    '/collections/salt-nicotine-brands',
-    '/collections/saltnic-labs',
-    '/collections/shijin-vapor-salt-nic',
-    '/collections/the-mamasan',
-    '/collections/tobacco-flavors-e-liquid',
-    '/collections/vgod-ejuice',
-    '/collections/vgod-saltnic',
-    '/collections/pod-systems',
-    '/collections/tanks',
-    '/collections/vape-accessories',
-    '/collections/vape-starter-kits',
-    '/collections/nicotine-pouches',
-    '/collections/ecigara',
-    '/collections/flavor-profile',
-    '/collections/newarrivals',
-    '/collections/vgod',
-    '/collections/all',
+# DISPOSABLE VAPES (PRIORITY)
+    "/collections/disposable-vapes",
+    "/collections/geek-bar",
+    "/collections/flum",
+    "/collections/lost-mary",
+    "/collections/adjust-brand",
+    "/collections/raz-vapes",
+    "/collections/foger?sort_by=best-selling&filter.p.m.custom.categories=Disposable",
+    "/collections/spaceman",
+    "/collections/swft",
+    "/collections/al-fakher",
+    "/collections/my-shisha-disposable-vapes",
+    "/collections/starbuzz",
+    
+    # Disposable by Flavor Profile
+    "/collections/fruit-flavor-disposable-vapes",
+    "/collections/candy-flavor-dispsoable-vapes",
+    "/collections/menthol-flavor-disposable-vapes",
+    "/collections/dessert-flavor-disposable-vapes",
+    "/collections/tobacco-flavor-disposable-vape",
+    "/collections/clear-flavor-disposable-vape",
+    
+    # Disposable by Nicotine Strength
+    "/collections/50mg-nicotine-disposable-vape",
+    "/collections/20mg-nicotine-disposable-vape",
+    "/collections/zero-nicotine-disposable-vape",
+    
+    # Disposable by Puff Count
+    "/collections/50k-puffs-disposable-vapes",
+    "/collections/40000-puffs-disposable-vapes",
+    "/collections/30000-puffs-disposable-vapes",
+    "/collections/25000-puffs-disposable-vapes",
+    "/collections/20000-puff-disposable-vapes",
+    "/collections/15000-puff-disposable-vapes",
+    "/collections/10000-puff-disposable-vapes",
+    "/collections/5000-puffs-disposable-vapes",
+    
+    # Disposable by Features
+    "/collections/freebase-disposable-vape",
+    "/collections/rechargeable-disposable-vapes",
+    "/collections/lcd-screen-disposable-vapes",
+    "/collections/mode-changing-disposable-vapes",
+    
+    # NEW ARRIVALS
+    "/collections/newarrivals",
+    
+    # ELIQUIDS
+    "/collections/eliquid",
+    "/collections/salt-nicotine-ejuice",
+    "/collections/freebase-nicotine-ejuice-brands",
+    
+    # Eliquid by Flavor (Salt Nic)
+    "/collections/fruity-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Salt+Nicotine",
+    "/collections/candy-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Salt+Nicotine",
+    "/collections/menthol-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Salt+Nicotine",
+    "/collections/dessert-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Salt+Nicotine",
+    "/collections/tobacco-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Salt+Nicotine",
+    
+    # Eliquid by Flavor (Freebase)
+    "/collections/fruity-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Freebase",
+    "/collections/candy-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Freebase",
+    "/collections/menthol-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Freebase",
+    "/collections/dessert-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Freebase",
+    "/collections/tobacco-flavors-e-liquid?sort_by=best-selling&filter.p.m.custom.ejuice_type=Freebase",
+    
+    # Eliquid Brands
+    "/collections/vgod-ejuice",
+    "/collections/saltnic-labs",
+    "/collections/monster-vape-labs",
+    "/collections/juice-head-eliquid",
+    "/collections/coastal-clouds",
+    "/collections/the-mamasan",
+    "/collections/7-daze-eliquid",
+    "/collections/glas-basix-ejuice",
+    "/collections/cloud-nurdz",
+    "/collections/its-pixy-ejuice",
+    "/collections/reds-ejuice",
+    "/collections/four-seasons-salts",
+    "/collections/naked-100",
+    "/collections/vgod",
+    
+    # Eliquid by Nicotine Strength
+    "/collections/50mg-nicotine-above-ejuice",
+    "/collections/40mg-to-50mg-ejuice",
+    "/collections/30mg-to-40mg-ejuice",
+    "/collections/20mg-to-30mg-ejuice",
+    "/collections/12mg-nicotine-eliquid",
+    "/collections/6mg-nicotine-eliquid",
+    "/collections/3mg-nicotine-eliquid",
+    "/collections/zero-nicotine-eliquid",
+    
+    # VAPE KITS
+    "/collections/vape-kits",
+    "/collections/vape-starter-kits",
+    "/collections/pod-systems",
+    "/collections/box-mods",
+    "/collections/vape-pen-kits",
+    "/collections/boro-box-mods",
+    
+    # Vaporizers
+    "/collections/vaporizers",
+    "/collections/herbal-vaporizers",
+    "/collections/concentrate-vaporizer",
+    "/collections/vape-batteries",
+    
+    # Tanks & RDAs
+    "/collections/tanks",
+    "/collections/sub-ohm-tanks",
+    
+    # Accessories
+    "/collections/vape-accessories",
+    "/collections/tank-replacement-coils",
+    "/collections/replacement-pods-pod-systems",
+    "/collections/others",
+    
+    # Starter Kit Brands
+    "/collections/uwell-starter-kits",
+    "/collections/smok-vape-starter-kits",
+    "/collections/geek-vape-vape-starter-kits",
+    "/collections/voopoo-vape-starter-kits",
+    
+    # Vaporizer Brands
+    "/collections/yocan-vaporizers",
+    "/collections/lookah-vaporizers",
+    "/collections/grenco-science",
+    
+    # Tank Brands
+    "/collections/geekvape?sort_by=best-selling&filter.p.m.custom.categories=Tanks",
+    "/collections/smok-tanks",
+    "/collections/ofrf",
+    "/collections/vaporesso-tanks",
+    "/collections/voopoo-tanks",
+    "/collections/horizon?sort_by=best-selling&filter.p.m.custom.categories=Tanks",
+    
+    # NICOTINE POUCHES
+    "/collections/nicotine-pouches",
+    
+    # Nicotine Pouches by Type
+    "/collections/moist-nicotine-pouches",
+    "/collections/dry-nicotine-pouches",
+    "/collections/semi-dry-nicotine-pouches",
+    
+    # Nicotine Pouches by Flavor
+    "/collections/fruit-flavor-nicotine-pouches",
+    "/collections/menthol-flavor-nicotine-pouches",
+    "/collections/menthol-fruity-nicotine-pouches",
+    "/collections/tobacco-flavor-nicotine-pouches",
+    "/collections/coffee-flavor-nicotine-pouches",
+    
+    # Nicotine Pouch Brands
+    "/collections/fre-nicotine-pouches",
+    "/collections/zimo-nicotine-pouches",
+    "/collections/zyn-nicotine-pouches",
+    "/collections/zone-nicotine-pouches",
+    "/collections/rogue-nicotine-pouches",
+    "/collections/grizzly-nicotine-pouches",
+    "/collections/velo-plus-nicotine-pouches",
+    "/collections/chlz-nicotine-pouches",
+    "/collections/lucy",
+    "/collections/lucy-breakers",
+    
+    # Nicotine Pouches by Strength
+    "/collections/3mg-nicotine-pouches",
+    "/collections/4mg-nicotine-pouches",
+    "/collections/6mg-nicotine-pouches",
+    "/collections/8mg-nicotine-pouches",
+    "/collections/9mg-nicotine-pouches",
+    "/collections/12mg-nicotine-pouches",
+    "/collections/15mg-nicotine-pouches",
+    
+    # Additional Brand Collections
+    "/collections/hyppe"
 ]
 
 print('TOTAL LINKS', len(links))
 found = dict()
 
+def extract_section_items(scope, keywords):
+    """
+    Finds a section whose heading/label matches any keyword in `keywords`,
+    then returns a list of bullet/line items from the next list, table, or text block.
+    """
+    found = []
 
-def get_html(url, clicked=False, closed=False, elements=True):
+    def _push_many(text):
+        # Split on bullets, line breaks, or commas (but not numbers like 1,000)
+        parts = re.split(r"[•·\n]|,(?!\s*\d)", text)
+        for p in parts:
+            s = re.sub(r"\s+", " ", p).strip(" :\u00b7•·-").strip()
+            if s:
+                found.append(s)
+
+    # Scan headings, summary elements, or strong/bold labels
+    for h in scope.find_all(["h2", "h3", "h4", "summary", "button", "strong", "b"]):
+        label = h.get_text(" ", strip=True).lower()
+        if any(k in label for k in keywords):
+            # Look for the next content block
+            nxt = h.find_next(lambda t: t and t.name in ("ul","ol","div","p","table"))
+            if nxt:
+                if nxt.name in ("ul", "ol"):
+                    for li in nxt.find_all("li"):
+                        _push_many(li.get_text(" ", strip=True))
+                elif nxt.name == "table":
+                    for tr in nxt.find_all("tr"):
+                        cells = tr.find_all(["td", "th"])
+                        if cells:
+                            _push_many(cells[0].get_text(" ", strip=True))
+                else:
+                    _push_many(nxt.get_text(" ", strip=True))
+
+    # Remove duplicates, preserve order
+    seen, out = set(), []
+    for item in found:
+        key = item.lower()
+        if key not in seen:
+            seen.add(key)
+            out.append(item)
+
+    return '\n'.join(out)
+
+def _clean(txt: str) -> str:
+    # collapse whitespace and trim
+    return re.sub(r"\s+\n", "\n", re.sub(r"[ \t]+", " ", txt)).strip()
+
+def extract_description(scope) -> str:
+    chunks = []
+
+    # 1) JSON-LD Product.description (if present)
+    for tag in scope.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(tag.string or tag.get_text(strip=True))
+        except Exception:
+            continue
+        objs = data if isinstance(data, list) else [data]
+        for obj in objs:
+            if isinstance(obj, dict) and obj.get("@type") == "Product":
+                desc = obj.get("description")
+                if isinstance(desc, str) and desc.strip():
+                    chunks.append(desc.strip())
+
+    # 2) Common description containers
+    selectors = [
+        "[data-product-description]",
+        ".product__description",
+        ".product-description",
+        "#description",
+        ".product-single__description",
+        ".rte",          # many themes use rich-text editor class
+        ".prose",        # tailwind prose blocks
+    ]
+    for sel in selectors:
+        for el in scope.select(sel):
+            txt = el.get_text(" ", strip=True)
+            if txt:
+                chunks.append(txt)
+
+    # 3) Sections following headings like "Description", "Details", "Features"
+    def looks_like_desc(s: str) -> bool:
+        s = s.lower()
+        return any(k in s for k in ("description", "details", "features", "about"))
+
+    for h in scope.find_all(["h2","h3","h4","button","summary"]):
+        label = h.get_text(" ", strip=True)
+        if label and looks_like_desc(label):
+            nxt = h.find_next(lambda t: t and t.name in ("div","section","article","p","ul","ol"))
+            if nxt:
+                txt = nxt.get_text(" ", strip=True)
+                if txt:
+                    chunks.append(txt)
+
+    # Deduplicate while preserving order
+    seen = set()
+    out = []
+    for chunk in chunks:
+        c = _clean(chunk)
+        if c and c not in seen:
+            seen.add(c)
+            out.append(c)
+
+    # Join with blank lines to keep paragraphs readable
+    return "\n\n".join(out)
+
+def extract_options(scope, keywords):
+    """
+    Extracts option text for any <fieldset>/<select> whose legend/label 
+    contains one of the given keywords.
+    Returns a list of unique strings in order of appearance.
+    """
+    found = []
+
+    # Fieldsets with matching legend
+    for fs in scope.find_all("fieldset"):
+        legend = fs.find("legend")
+        if legend and any(k in legend.get_text(strip=True).lower() for k in keywords):
+            for opt in fs.find_all(["option", "button", "label"]):
+                txt = opt.get_text(strip=True)
+                if txt and txt.lower() not in {"choose an option", "select"}:
+                    found.append(txt)
+
+    # Label + select pairs
+    for lab in scope.find_all("label"):
+        if any(k in lab.get_text(strip=True).lower() for k in keywords):
+            sel = lab.find_next("select")
+            if sel:
+                for opt in sel.find_all("option"):
+                    txt = opt.get_text(strip=True)
+                    if txt and txt.lower() not in {"choose an option", "select"}:
+                        found.append(txt)
+
+def get_html(url, clicked=False, closed=True, elements=True):
 
     driver = None
     try:
@@ -151,17 +421,56 @@ def get_html(url, clicked=False, closed=False, elements=True):
 
     return html
 
-def extract_options(soup, header_name):
-    options = []
-    header = soup.find('span', text=header_name)
-    if header:
-        # Find the next div with the class 'block-swatch-list' containing the options
-        option_div = header.find_next('div', class_='block-swatch-list')
-        if option_div:
-            inputs = option_div.find_all('input', class_='block-swatch__radio')
-            for option in inputs:
-                options.append(option['value'])
-    return options
+def extract_options(scope, labels):
+    """
+    Returns a list of option texts for the first matching label in `labels`.
+    Example:
+        extract_select_options(main, ["Flavor", "Colour", "Color"])
+    """
+    labels_lower = [lbl.strip().lower() for lbl in labels]
+
+    # Find the label element that matches any in the list
+    label_el = scope.find("label", string=lambda s: s and s.strip().lower() in labels_lower)
+    if not label_el:
+        return []
+
+    # Get the <select> element after the label
+    select = label_el.find_next("select")
+    if not select:
+        return []
+
+    # Collect the displayed text of each <option>
+    return [opt.get_text(strip=True) for opt in select.find_all("option")]
+
+def extract_product_images(scope):
+    """
+    Return [{'url': str, 'alt': str}, ...] from the main gallery
+    (ignores thumbnails). Protocol-relative URLs ('//...') -> 'https://...'.
+    """
+    out, seen = [], set()
+
+    gallery = scope.select_one(".product__gallery-container") or scope
+    for img in gallery.select(".product__media-list img"):
+        url = img.get("src") or img.get("data-src") or ""
+        if not url and img.get("srcset"):
+            # fallback: take last (largest) srcset candidate
+            parts = [p.strip().split()[0] for p in img["srcset"].split(",") if p.strip()]
+            url = parts[-1] if parts else ""
+
+        if not url:
+            continue
+
+        if url.startswith("//"):
+            url = "https:" + url  # assume https
+
+        alt = (img.get("alt") or "").strip()
+
+        # de-dupe by URL
+        if url not in seen:
+            seen.add(url)
+            out.append({"url": url, "alt": alt})
+
+    return out
 
 if __name__ == "__main__":
     from collections import Counter
@@ -175,11 +484,12 @@ if __name__ == "__main__":
     
     with open('scraping/data-latest/csvape_scrape.csv', mode='w') as file:
 
-        for l in links:
+        for top_level_link in links:
             page = 1
-            site_section = l.replace('/collections/', '')
+            site_section = top_level_link.replace('/collections/', '').split('?')[0]
 
-            url = f'{BASE}{l}'
+            url = f'{BASE}{top_level_link}'
+            print('TOP LEVEL LINK', url)
 
             if url in found:
                 reqtxt = found[url]
@@ -188,16 +498,16 @@ if __name__ == "__main__":
                 found[url] = reqtxt
             #reqtxt = get_html(url)
             soup = BeautifulSoup(reqtxt)
-            products = soup.find_all('div', {'class': 'product-item'})
+            products = soup.find_all('div', {'class': 'product-card'})
             print(url, len(products))
 
             for p in products:
                 if not isinstance(p, element.Tag):
                     continue
-                title = p.find("a", class_="product-item__title").text.strip()
-                link = p.find("a", class_="product-item__title")['href']
+                title = p.find("a", class_="product-card__title").text.strip()
+                link = p.find("a", class_="product-card__title")['href']
                 spe = p.find("span", class_="price--highlight")
-                rpe = p.find("span", class_="price")
+                rpe = p.find("span", class_="price__regular")
                 sale_price = None
                 reg_price = None
 
@@ -214,7 +524,7 @@ if __name__ == "__main__":
                 if rpe_txt and 'Sale price' in rpe_txt:
                     sale_price = rpe_txt.replace('Sale price', '').strip()
                 else:
-                    print('price check')
+                    reg_price = rpe_txt
 
                 print(link)
 
@@ -225,14 +535,14 @@ if __name__ == "__main__":
                 #     reg_price = None
 
 
-                tag = link.split('/')[-1]
+                tag = link.split('/')[-1].split('?')[0]
 
                 if product_exists(CS_VAPE, tag):
                     print('EXISTS', tag)
                     continue
                 full_link = f'{BASE}{link}'
 
-                img_urls = []
+
 
                 if full_link in found:
                     reqtxt = found[full_link]
@@ -243,174 +553,49 @@ if __name__ == "__main__":
                 psoup = BeautifulSoup(reqtxt)
                 txt = psoup.get_text()
 
-                img_tag = psoup.find('img', class_='product-gallery__image')
-                img_alt = None
-                if img_tag and 'alt' in img_tag.attrs:
-                    img_alt = img_tag['alt']
+                main = psoup.find(id="MainContent") or psoup.find("main") or psoup
+                if not main:
+                    print('NO MAIN CONTENT', full_link)
+                    continue
+                
+                media_container = main.select_one(".product__media-container")
 
-                if img_tag and 'data-srcset' in img_tag.attrs:
-                    spl =  img_tag['data-srcset'].split(',')
-                    for s in spl:
-                        if s.strip().startswith('http'):
-                            img_urls.append({'url': s.strip(), 'alt': img_alt})
-                        elif s.strip().startswith('//'):
-                            img_urls.append({'url': 'http:' + s.strip(), 'alt': img_alt})
-
-                elif img_tag and 'data-zoom' in img_tag.attrs:
-                    # Extract the URL from the data-zoom attribute
-                    spl =  img_tag['data-zoom'].split(',')
-                    for s in spl:
-                        if s.strip().startswith('http'):
-                            img_urls.append({'url': s.strip(), 'alt': img_alt})
-                        elif s.strip().startswith('//'):
-                            img_urls.append({'url':'http:' + s.strip(), 'alt': img_alt})
-
-
+                if not media_container:
+                    images = []
                 else:
-                    print('NO IMAGE URL', full_link)
+                    # Extract images
+                    img_urls = extract_product_images(media_container)
 
-                container = psoup.find('div', {'class': 'container container--flush'})
-                if container:
-                    items_to_remove = container.find('path')
-                    if items_to_remove:
-                        items_to_remove.decompose()
-                    remove = container.find('script')
-                    if remove:
-                        remove.decompose()
-
-                    remove = container.find('nav')
-                    if remove:
-                        remove.decompose()
-
-                    remove = container.find('noscript')
-                    if remove:
-                        remove.decompose()
-                    items_to_remove = container.find('div', {'class': 'product-block-list__item--reviews'})
-                    if items_to_remove:
-                        items_to_remove.decompose()
-
-                    remove = container.find('li', {'class': 'social-media__item social-media__item--pinterest'})
-                    if remove:
-                        remove.decompose()
-                    remove = container.find('li', {'class': 'social-media__item social-media__item--twitter'})
-                    if remove:
-                        remove.decompose()
-
-                    remove = container.find('li', {'class': 'social-media__item social-media__item--facebook'})
-                    if remove:
-                        remove.decompose()
-                    items_remove = container.find('div', {'class': 'product-form__payment-container'})
-                    if items_remove:
-                        items_remove.decompose()
-
-                    remove = container.find('div', {'class': "product-block-list__item product-block-list__item--shipping"})
-                    if remove:
-                        remove.decompose()
-
-                    title = container.find('h1', class_='product-meta__title').text.strip()
-
-        #             # Extract price
-        #             price = container.find('span', class_='price price--highlight').text.strip()
-        #             compare_price = container.find('span', class_='price price--compare').text.strip()
-
-                    stock_element = container.find('span', class_='product-form__inventory')
-
-                    # Check the stock status text
-                    if stock_element:
-                        stock_status = stock_element.text.strip()
-                    else:
-                        stock_status = ""
-
-                    section_map = dict()
-                    description_text = ''
-                    # Extract product description
-                    description_div = container.find('div', class_='product-block-list__item--description')
-                    
-                    if description_div:
-                        # Find the 'rte text--pull' div within the description div
-                        rte_div = description_div.find('div', class_='rte text--pull')
-                        
-                        if rte_div:
-                            # Extract the text from the rte_div
-                            description_text = rte_div.get_text(strip=True)
-                    section_map['description'] = description_text
+                    n = 0
+                    images = list()
+                    for i in img_urls:
+                        n += 1
+                        img = download_image(i['url'], tag, save_dir='data_from_sites_v2/csvape_images', alt=i['alt'])
+                        # these seem to be the same
+                        if img:
+                            images.append(img)
 
 
-                    flavors = []
-                    colors = []
-                    nicotine_strengths = []
-                    bottle_sizes = []
+                flavors = extract_options(main, ["flavor", "flavors", "flavor list", "available flavors"])
+                colors  = extract_options(main, ["color", "colour", "colors", "available colors", "available colours", "color list", "colour list"])
+                nicotine_strengths = extract_options(main, ["nicotine_strength", "nicotine_strengths", "nicotine", "available strengths", "nicotine strengths", "strength", "strengths", "mg", "mg/ml", "mg/ml"])
+                bottle_sizes = extract_options(main, ["bottle_size", "bottle_sizes", "size", "sizes", "ml", "oz"])
 
-                    product_lists = container.find_all('div', class_='product-form__option')
-                    if product_lists:
-                        for product_list in product_lists:
-                            product_lists_text = product_list.get_text(strip=True)
-                            blocks = product_list.find_all('div', class_='block-swatch')
-                            options = product_list.parent.find_all('option')
+                # Extract description
+                desc = extract_description(main)
 
-                            if product_lists_text.lower().startswith('flavor'):
-                                # Loop through each block and extract flavor name and disabled status
-                                for block in blocks:
-                                    name = block.find('span', class_='block-swatch__item-text').text
-                                    is_disabled = 'block-swatch--disabled' in block.get('class', [])
-                                    flavors.append(name)
-                            elif product_lists_text.lower().startswith('color'):
-                                if options:
-                                    for o in options:
-                                        val = o['value']
-                                        try:
-                                            float(val)
-                                        except Exception as ex:
-                                            colors.append(val)
-                            elif product_lists_text.lower().startswith('nicotine strength'):
-                                # Loop through each block and extract flavor name and disabled status
-                                for block in blocks:
-                                    name = block.find('span', class_='block-swatch__item-text').text
-                                    is_disabled = 'block-swatch--disabled' in block.get('class', [])
-                                    value, unit = extract_value_and_unit(name)
-                                    if len(value) > 0:
-                                        value = value[0]
-                                    else:
-                                        value = None
-                                    if len(unit) > 0:   
-                                        unit = unit[0]
-                                    else:
-                                        unit = None
-                                    if value and unit:
-                                        val = {
-                                            'value': value,
-                                            'unit': unit
-                                        }
-                                        nicotine_strengths.append(val)
-                            elif product_lists_text.lower().startswith('salt nicotine'):
-                                # Loop through each block and extract flavor name and disabled status
-                                for block in blocks:
-                                    name = block.find('span', class_='block-swatch__item-text').text
-                                    is_disabled = 'block-swatch--disabled' in block.get('class', [])
-                                    val_units = extract_salt_nic_val_and_unit(name)
-                                    for v in val_units:
-                                        val = {
-                                            'value': v[0],
-                                            'unit': v[1]
-                                        }
-                                        nicotine_strengths.append(val)
-                            elif product_lists_text.lower().startswith('variant') or product_lists_text.lower().startswith('resistance') or product_lists_text.lower().startswith('capacity')  or product_lists_text.lower().startswith('denominations') or product_lists_text.lower().startswith('style') or product_lists_text.lower().startswith('bottle size'):
-                                continue
-                            else:
-                                # 'Salt Nicotine:50mg (5%)30mg (3%)50mg (5%)'
-                                print(product_lists_text)
+                #ingredients 
+                ingredients = extract_section_items(main, ["ingredient", "ingredients", ])
 
+                # Package Contents
+                package_contents = extract_section_items(main, ["included in the package", "package contents", "in the box", "what's included", "whats included", "contents",  "what's inside", "whats inside",])
 
-                n = 0
-                images = list()
-                for i in img_urls:
-                    n += 1
-                    img = download_image(i['url'], tag, save_dir='data_from_sites_v2/csvape_images', alt=i['alt'])
-                    # these seem to be the same
-                    images.append(img)
-                    break
+                # Key Features
+                key_features = extract_section_items(main, ["key features", "features"])
 
+                warnings = extract_section_items(main, ["warnings", "warning", "caution", "safety information"])
 
+                flavor_description = extract_section_items(main, ["flavor description", "flavor profile", "flavor notes", "tasting notes", "flavor details", "flavor description", "flavor profile", "tasting notes", "flavor notes", "flavors", "available_flavors"]) 
 
                 # Extracting product information
                 product_data = {
@@ -419,28 +604,34 @@ if __name__ == "__main__":
                     "link": full_link,
                     "sale_price": sale_price,
                     "regular_price": reg_price,
-                    "image_urls": images,
-                    'flavor_list': flavors,
-                    'color_list': colors,
-                    'nicotine_strengths': nicotine_strengths,
-                    'bottle_sizes': bottle_sizes,
-                    "stock_status": stock_status,
+                    "image_urls": images, #list
+                    'flavor_list': flavors, #list
+                    'flavor_text': flavor_description, #str
+                    'color_list': colors, #list
+                    'nicotine_strengths': nicotine_strengths, #list
+                    'bottle_sizes': bottle_sizes, #list
+                    "stock_status": '',
                     'site_category': site_section,
                     'images': images,
                     'html': reqtxt,
                     'plain_text': txt,
+                    'description': desc,
+                    'sku': '',
+                    'nicotine_strength': '',
+                    'power_level': '',
+                    'battery': '',
+                    'coil': '',
+                    'puffs': '',
+                    'eliquid_contents': '',
+                    'warnings': warnings,
+                    'ingredients': ingredients,
+                    'features': key_features,
+                    'package_contents': package_contents,
                 }
-                desc_fields = ''
-                for s, v in section_map.items():
-                    if 'description' not in s:
-                        s = s + '_description'
-                    product_data[s] = v.replace('\xa0', ' ').strip()
-                    if product_data[s] != '':
-                        desc_fields += f'\n{product_data[s]}'
 
                 feats = list()
                 #print(desc_fields)
-                feat = find_features(desc_fields)
+                feat = find_features(desc)
                 any_found, puffs_res, nico_res, ml_res, flav_text, dev_text = feat
                 product_data['puffs'] = puffs_res
                 product_data['nicotine_strength'] = nico_res
@@ -455,24 +646,6 @@ if __name__ == "__main__":
                 product_data['mesh_bool'] = mesh
                 product_data['usb_bool'] = usb
                 product_data['adjustable_bool'] = adjustable
-
+                
+                print('MAP PRODUCT DATA', top_level_link, )
                 map_product_data(CS_VAPE, product_data)
-
-                #print(product_data)
-
-                #product_list.append(product_data)
-
-                #print(product_data.keys())
-
-
-
-                if not has_header:
-                    # Create a DictWriter object
-                    writer = csv.DictWriter(file, fieldnames=product_data.keys())
-
-                    # Write the header (column names)
-                    writer.writeheader()
-                    
-                    has_header = True
-
-                writer.writerow(product_data)
