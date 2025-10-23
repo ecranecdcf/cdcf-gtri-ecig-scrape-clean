@@ -56,12 +56,12 @@ NLP Updates
 
 .. image:: images/sep4_0.png
    :alt: flavor categorization stats
-   :width: 50%
+   :width: 100%
    :align: left
 
 .. image:: images/sep4_1.png
    :alt: flavor categorization stats
-   :width: 50%
+   :width: 100%
    :align: right
 
 
@@ -75,12 +75,12 @@ Flavor extraction
 
 .. image:: images/sep4_2.png
    :alt: flavor categorization stats
-   :width: 50%
+   :width: 100%
    :align: left
 
 .. image:: images/sep4_3.png
    :alt: flavor categorization stats
-   :width: 50%
+   :width: 100%
    :align: right
 
 
