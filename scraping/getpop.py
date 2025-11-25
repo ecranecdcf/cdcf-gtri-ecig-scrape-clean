@@ -330,7 +330,7 @@ def main():
                     simpletxt, reqtxt = get_html(url)
                     found[url] = reqtxt
                 #reqtxt = get_html(url)
-                soup = BeautifulSoup(reqtxt)
+                soup = BeautifulSoup(reqtxt, features="lxml")
                 products = soup.find_all('div', {'class': 'product-card'})
                 print(url, len(products))
                 
@@ -377,15 +377,11 @@ def main():
                     # else:
                     #     reg_price = None
 
-
-                    tag = link.split('/')[-1]
-
-                    if product_exists(company, tag):
-                        print('EXISTS', tag)
-                        continue
                     full_link = f'{BASE}{link}'
 
                     img_urls = []
+
+                    tag = link.split('/')[-1]
 
                     if full_link in found:
                         reqtxt = found[full_link]
@@ -394,8 +390,19 @@ def main():
                         simpletxt, reqtxt = get_html(full_link)
                         found[full_link] = reqtxt
                     print(full_link)
-                    psoup = BeautifulSoup(reqtxt)
+                    psoup = BeautifulSoup(reqtxt, features="lxml")
                     txt = psoup.get_text()
+
+                    product_id = get_product_id(company, tag)
+                    if product_id:
+                        print('EXISTS', tag)
+                        reviews = extract_reviews(psoup)
+                        review_attributes = extract_flavor_ratings(psoup)
+
+                        insert_reviews(reviews, product_id)
+                        insert_review_attributes(review_attributes, product_id)
+
+                        continue
 
                     thumbnails = psoup.find('div', class_='product__media-gallery-thumbails')
                     gallery = psoup.find('div', class_='product__media-gallery-viewer-wrap')
@@ -589,28 +596,5 @@ def main():
 
 
 if __name__ == "__main__":
-    do_update = False
-    if do_update:
-        results = get_products(GETPOP)
-
-        for product_id, db_html, site_tag in results:
-            print(product_id, site_tag)
-
-            try:
-                simple, html = get_html(f'https://getpop.co/products/{site_tag}')
-                soup = BeautifulSoup(html)
-                reviews = extract_reviews(soup)
-
-                if len(reviews) > 0:
-                    insert_reviews(reviews, product_id)
-
-                rev_attributes = extract_flavor_ratings(soup)
-                if len(rev_attributes.keys()) > 0:
-                    insert_review_attributes(rev_attributes, product_id)
-                time.sleep(1)
-            except Exception as e:
-                print(e)
-                traceback.print_exc()
-                continue
-    else:
-        main()
+    
+    main()

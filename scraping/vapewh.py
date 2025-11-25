@@ -232,6 +232,23 @@ def extract_options_generic(soup, keywords):
     seen = set()
     return [m for m in matches if not (m in seen or seen.add(m))]
 
+def get_reviews(psoup):
+    reviews = []
+    reviews_section = psoup.find('iframe', id='looxReviewsFrame')
+    if reviews_section:
+        iframe_src = reviews_section.get('src')
+        if iframe_src:
+            print('REVIEWS IFRAME SRC', iframe_src)
+            reviews_html = get_html(iframe_src, load_more=True, clicked=True, closed=True)
+            reviews_soup = BeautifulSoup(reviews_html, features="lxml") 
+            review_items = reviews_soup.find_all('div', class_='grid-item-wrap has-img')
+            for ri in review_items:
+                #print('REVIEW ITEM', ri )
+                ri_info = parse_review_card(ri)
+                if ri_info:
+                    reviews.append(ri_info)
+    return reviews
+
 def get_html(url, clicked=False, closed=False, elements=True, load_more=False):
 
     driver = None
@@ -335,7 +352,7 @@ def get_html(url, clicked=False, closed=False, elements=True, load_more=False):
 
     return html
 
-if __name__ == "__main__":
+def main():
     from collections import Counter
 
     product_list = list()
@@ -361,7 +378,7 @@ if __name__ == "__main__":
                 reqtxt = get_html(url)
                 found[url] = reqtxt
             #reqtxt = get_html(url)
-            soup = BeautifulSoup(reqtxt)
+            soup = BeautifulSoup(reqtxt, features="lxml")
             products = soup.find_all('product-card')
             print(url, len(products))
             
@@ -387,8 +404,22 @@ if __name__ == "__main__":
                     full_link = f'{BASE}{product_url_path}'
                     tag = product_url_path.split('/')[-1].split('?')[0]
 
-                if product_exists(company, tag):
+                print(full_link)
+
+                if full_link in found:
+                    product_html = found[full_link]
+                else:
+                    product_html = get_html(full_link)
+                    found[full_link] = product_html
+
+                psoup = BeautifulSoup(product_html, features="lxml")
+                txt = psoup.get_text()
+
+                product_id = get_product_id(company, tag)
+                if product_id:
                     print('EXISTS', tag)
+                    reviews = get_reviews(psoup)
+                    insert_reviews(reviews, product_id)
                     continue
 
 
@@ -424,16 +455,7 @@ if __name__ == "__main__":
                     if img:
                         valid_image_list.append(img)
 
-                print(full_link)
 
-                if full_link in found:
-                    product_html = found[full_link]
-                else:
-                    product_html = get_html(full_link)
-                    found[full_link] = product_html
-
-                psoup = BeautifulSoup(product_html)
-                txt = psoup.get_text()
 
                 main_element = psoup.find("main", {"id": "MainContent"})
                 flavor_list = extract_options_generic(main_element, ["flavor", "flavours", "flavour", "flavors", "flavor profile", "taste", "taste profile", "choose your flavor", "choose your flavour", "flavor options", "flavour options", "flavor selection", "flavour selection", "available flavors", "available flavours", "flavor choices", "flavour choices", "flavor selection", "flavour selection"])
@@ -468,20 +490,8 @@ if __name__ == "__main__":
                 if not description or description == '':
                     description = specs + ' ' + package_contents + ' ' + warnings_text + ' ' + flavor_details
                     
-                reviews = []
-                reviews_section = psoup.find('iframe', id='looxReviewsFrame')
-                if reviews_section:
-                    iframe_src = reviews_section.get('src')
-                    if iframe_src:
-                        print('REVIEWS IFRAME SRC', iframe_src)
-                        reviews_html = get_html(iframe_src, load_more=True, clicked=True, closed=True)
-                        reviews_soup = BeautifulSoup(reviews_html, 'html.parser') 
-                        review_items = reviews_soup.find_all('div', class_='grid-item-wrap has-img')
-                        for ri in review_items:
-                            #print('REVIEW ITEM', ri )
-                            ri_info = parse_review_card(ri)
-                            if ri_info:
-                                reviews.append(ri_info)
+                reviews = get_reviews(psoup)
+                
 
 
                 product_data = {
@@ -536,3 +546,8 @@ if __name__ == "__main__":
                 
                 print('MAP PRODUCT DATA', top_level_link, )
                 map_product_data(company, product_data)
+
+if __name__ == "__main__":
+
+    print('get new products')
+    main()

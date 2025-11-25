@@ -59,6 +59,37 @@ ELEMENT_VAPE = "ELEMENT_VAPE"
 MIPOD = "MIPOD"
 
 
+def get_product_id(site_name, site_tag):
+    connection = None
+    cursor = None
+    try:
+        connection = connect()  # Use our connect() function
+        cursor = connection.cursor()
+        
+        query = """
+            SELECT id
+            FROM ecig_product
+            WHERE site_name = ? AND site_tag = ?
+        """
+        
+        cursor.execute(query, (site_name, site_tag))
+        one = cursor.fetchone()
+        if one:
+            val = one[0]
+        else:
+            val = None
+        
+    except Exception as error:
+        print(f"Error finding product in Azure db: {error}")
+        traceback.print_exc()
+        val = None
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:  
+            connection.close()
+    return val
+
 
 def product_exists(site_name, site_tag):
     connection = None
@@ -264,11 +295,11 @@ def insert_review_attributes(review_attributes_dict, product_id):
     try:
         connection = connect()  # Use our connect() function
         cursor = connection.cursor()
-        insert_review_attributes_to_db(cursor, review_attributes_dict, product_id)
+        rows = insert_review_attributes_to_db(cursor, review_attributes_dict, product_id)
 
         # Commit the transaction
         connection.commit()
-        print("Review Attributes data inserted into Azure successfully!")
+        print(f"{len(rows)} Review Attributes data inserted into Azure!")
 
     except Exception as error:
         print(f"Azure insert_review_attributes Error: {error}")
@@ -307,7 +338,7 @@ def insert_review_attributes_to_db(cursor, review_attributes_dict, product_id):
         
         if existing_row:
             # Record already exists, add its ID to the list
-            inserted_ids.append(existing_row[0])
+            continue
         else:
             # Record doesn't exist, insert new one
             insert_query = """
@@ -332,11 +363,11 @@ def insert_reviews(reviews, product_id):
     try:
         connection = connect()  # Use our connect() function
         cursor = connection.cursor()
-        insert_reviews_to_db(reviews, product_id, cursor)
+        rows = insert_reviews_to_db(reviews, product_id, cursor)
 
         # Commit the transaction
         connection.commit()
-        print("Review data inserted into Azure successfully!")
+        print(f"{len(rows)} Review data rows inserted into Azure!")
 
     except Exception as error:
         print(f"Azure insert_review_attributes Error: {error}")
@@ -359,14 +390,31 @@ def insert_reviews_to_db(reviews, product_id, cursor) -> None:
         product_id: ID of the product these reviews belong to
         connection_params: Database connection parameters
     """
-    skipped_count = 0
+    rows = list()
+    unique_keys = ['review_text', 'author', 'date']
+
+    # Use a set to track seen combinations
+    seen = set()
+    unique_reviews = []
+
     for review in reviews:
+        key = tuple(review[k] for k in unique_keys)
+        if key not in seen:
+            seen.add(key)
+            unique_reviews.append(review)
+
+        skipped_count = 0
+    for review in unique_reviews:
+        content = review.get('review_text')
+
+        if not content or content.strip() == '':
+            continue
+
         check_query = """
             SELECT TOP 1 id FROM ecig_reviews 
             WHERE product_id = ? 
             AND (author = ?)
-            AND (review_date = ?)
-            AND (variant = ?)
+            AND (review_text = ?)
             """
 
         # Insert review data
@@ -380,19 +428,19 @@ def insert_reviews_to_db(reviews, product_id, cursor) -> None:
         # Convert review date string to date object if present
         review_date = review.get('date')
         author = review.get('author')
-        content = review.get('review_text')
         sweet_level = review.get('sweet_level')
         iced_level = review.get('iced_level') # Default to 0 if not present
         variant = review.get('variant')
         rating = review.get('rating')
-            
+
+        # commit any pending transactions
+           
         cursor.execute(
             check_query, 
             (
                 product_id,
                 author,
-                review_date,
-                variant
+                content
             )
         )
         
@@ -404,7 +452,7 @@ def insert_reviews_to_db(reviews, product_id, cursor) -> None:
             skipped_count += 1
             continue
         
-
+        
         cursor.execute(
             insert_review_query, 
             (
@@ -427,6 +475,7 @@ def insert_reviews_to_db(reviews, product_id, cursor) -> None:
         review_row = cursor.fetchone()
         if review_row:
             review_id = review_row[0]
+            rows.append(review_id)
         else:       
             # If no review was inserted, use a default value
             print(f"Review not inserted to Azure for {author}")  
@@ -463,6 +512,7 @@ def insert_reviews_to_db(reviews, product_id, cursor) -> None:
                             attr_value_str
                         )
                     )
+    return rows
 
 
 
@@ -549,6 +599,18 @@ def insert_ecig_product_attributes(cursor, attributes_data):
 
 
 def insert_ecig_flavors(cursor, flavors_data):
+    check_query = """
+        SELECT TOP 1 id FROM ecig_flavors 
+        WHERE product_id = ? AND flavor_name = ?
+    """
+    
+    cursor.execute(check_query, (flavors_data['product_id'], flavors_data['flavor_name']))
+    existing_row = cursor.fetchone()
+    
+    if existing_row:
+        # Record already exists, add its ID to the list
+        return
+
     query = """
         INSERT INTO ecig_flavors (
             product_id, flavor_name, flavor_description, flavor_category, iced_bool, cbd_bool
@@ -572,6 +634,19 @@ def insert_ecig_flavors(cursor, flavors_data):
 
 
 def insert_ecig_nicotine_levels(cursor, nicotine_levels_data):
+
+    check_query = """
+        SELECT TOP 1 id FROM ecig_nicotine_levels 
+        WHERE product_id = ? AND value = ?
+    """
+    
+    cursor.execute(check_query, (nicotine_levels_data['product_id'], nicotine_levels_data['value']))
+    existing_row = cursor.fetchone()
+    
+    if existing_row:
+        # Record already exists, add its ID to the list
+        return
+
     query = """
         INSERT INTO ecig_nicotine_levels (
             product_id, value, unit
@@ -592,6 +667,18 @@ def insert_ecig_nicotine_levels(cursor, nicotine_levels_data):
 
 
 def insert_ecig_images(cursor, images_data):
+
+    check_query = """
+        SELECT TOP 1 id FROM ecig_images 
+        WHERE product_id = ? AND path = ?
+    """
+    
+    cursor.execute(check_query, (images_data['product_id'], images_data['path']))
+    existing_row = cursor.fetchone()
+    
+    if existing_row:
+        # Record already exists, add its ID to the list
+        return
     query = """
         INSERT INTO ecig_images (
             product_id, url, path, title, alt_text
@@ -609,5 +696,43 @@ def insert_ecig_images(cursor, images_data):
         images_data['title'],
         images_data['alt_text']
     )
+
+    
     
     cursor.execute(query, params)
+
+
+def get_product_reviews():
+    results = []
+    try:
+        connection = connect()  # Use our connect() function
+        cursor = connection.cursor()
+
+        # The SQL query with a parameter placeholder for site_name
+        query = """select p.site_tag, p.site_name,
+r.id, r.product_id, r.review_date , r.review_text, r.sweet_level, r.iced_level, 
+r.rating
+from 
+ecig_reviews r
+inner join ecig_product p on
+p.id = r.product_id;
+        """
+
+        # Execute the query with the site_name parameter
+        cursor.execute(query, )
+
+        # Fetch all the results
+        results = cursor.fetchall()
+
+
+    except Exception as error:
+        print(f"Azure get_products_without_reviews Error: {error}")
+        traceback.print_exc()
+        if connection:
+            connection.rollback()
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+    return results
